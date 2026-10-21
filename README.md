@@ -18,7 +18,11 @@ A theme plugin for the BigBlueButton 4.0 HTML5 client. It is pure CSS shipped as
 - Chat input pinned to the bottom, with a thin border. The send button is just the icon.
 
 **Action bar**
-- 56px buttons with 24px icons. Active buttons (microphone on, hand raised...) are blue with a white icon.
+- 48px buttons with 10px corners and 22px icons, the same shape as the icon bar buttons. Active buttons (microphone on, hand raised...) are blue with a white icon.
+- The presentation and media area buttons stay together in a single capsule, with the same corners.
+
+**Other buttons**
+- Icon buttons in the top bar, sidebar panel and presentation (connection status, leave, options, slide navigation, zoom, undo/redo) use 8px corners instead of circles.
 
 **Icons**
 - The icon bar and the action bar use [Lucide](https://lucide.dev) icons instead of the `bbb-icons` font: microphone, camera, screen share, reactions, raise hand, profile settings, users, chat, notes, apps, breakout rooms, polls, timer, learning dashboard and settings.
