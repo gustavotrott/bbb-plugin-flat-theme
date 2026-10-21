@@ -2,9 +2,17 @@
 
 A theme plugin for the BigBlueButton 4.0 HTML5 client. It is pure CSS shipped as a plugin: no client rebuild, no `customStyleUrl`, no extra files to host besides the plugin itself.
 
-![Flat theme on BigBlueButton 4.0](docs/screenshot.jpg)
+![Flat theme on BigBlueButton 4.0](docs/after.jpg)
 
-_Camera images in the screenshot are illustrations._
+## Before and after
+
+The same meeting, same window, with and without the theme.
+
+| Before (default client) | After (with this plugin) |
+|---|---|
+| ![Before](docs/before.jpg) | ![After](docs/after.jpg) |
+
+_Camera images in the screenshots are illustrations._
 
 ## What it changes
 
