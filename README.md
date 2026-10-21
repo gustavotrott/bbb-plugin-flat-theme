@@ -1,0 +1,85 @@
+# bbb-plugin-flat-theme
+
+A theme plugin for the BigBlueButton 4.0 HTML5 client. It is pure CSS shipped as a plugin: no client rebuild, no `customStyleUrl`, no extra files to host besides the plugin itself.
+
+![Flat theme on BigBlueButton 4.0](docs/screenshot.jpg)
+
+## What it changes
+
+**Icon bar (left)**
+- Full height, no padding and no rounded corners, on a solid blue background.
+- Narrower: 72px instead of the client's `60px + 2% of the window`.
+- 48px buttons with white icons. The active item gets a lighter background and a marker on the right edge.
+- The logo (when there is one) sits on a white tile, so any logo reads well on the dark bar.
+
+**Sidebar panel (chat, users, notes...)**
+- Flush with the icon bar and full height: no padding, no rounded corners, no shadow.
+- 64px header with a bottom line, title in regular case.
+- Chat input pinned to the bottom, with a thin border. The send button is just the icon.
+
+**Action bar**
+- 56px buttons with 24px icons. Active buttons (microphone on, hand raised...) are blue with a white icon.
+
+**Icons**
+- The icon bar and the action bar use [Lucide](https://lucide.dev) icons instead of the `bbb-icons` font: microphone, camera, screen share, reactions, raise hand, profile settings, users, chat, notes, apps, breakout rooms, polls, timer, learning dashboard and settings.
+- Icons keep showing the state, like the client does: a crossed microphone when muted, a crossed camera when it is off, a crossed screen when not sharing.
+- Icons elsewhere (user list, menus) keep the client defaults.
+
+## Install
+
+1. Build the bundle (or grab `dist/` from a release):
+
+   ```bash
+   npm install
+   npm run build-bundle
+   ```
+
+2. Copy `dist/` to a folder served by nginx on the BigBlueButton server, for example:
+
+   ```bash
+   sudo mkdir -p /var/www/bigbluebutton-default/assets/plugins/bbb-plugin-flat-theme
+   sudo cp dist/* /var/www/bigbluebutton-default/assets/plugins/bbb-plugin-flat-theme/
+   ```
+
+3. Add the manifest to `pluginManifests` in `/etc/bigbluebutton/bbb-web.properties` (keep the other plugins you already have in the list):
+
+   ```properties
+   pluginManifests=[{"url":"https://<your-server>/plugins/bbb-plugin-flat-theme/manifest.json"}]
+   ```
+
+4. Restart bbb-web: `sudo systemctl restart bbb-web`. Meetings created from then on load the theme.
+
+To try it on a single meeting instead, pass the manifest on the `create` call: `pluginManifests=[{"url":"https://<your-server>/plugins/bbb-plugin-flat-theme/manifest.json"}]`.
+
+If you used a `customStyleUrl` before, remove it from `/etc/bigbluebutton/bbb-html5.yml` and restart `bbb-apps-akka` as well: the client settings are stored per meeting by akka-apps, which only reads that file on startup.
+
+## Customizing
+
+Colors and the icon bar width are CSS variables at the top of [`src/theme.css`](src/theme.css):
+
+| Variable | Default | Used for |
+|---|---|---|
+| `--theme-background` | `#102133` | Background behind the presentation, top bar and action bar |
+| `--theme-nav` | `#133459` | Icon bar |
+| `--theme-nav-active` | `#1E4877` | Active item in the icon bar |
+| `--theme-primary` | `#0F70D7` | Active marker, active buttons, focused input |
+| `--theme-nav-width` | `72px` | Icon bar width |
+
+Change them and rebuild.
+
+## How it works
+
+The plugin imports `src/theme.css` through `style-loader`, which injects it into `<head>` when the bundle loads. SVG icons are inlined as data URIs, so the plugin is a single JS file. The React component only calls `BbbPluginSdk.initialize()` so the client reports the plugin as loaded.
+
+Some details worth knowing if you change the CSS:
+
+- The client positions the icon bar, sidebar panel, presentation and action bar in JS, with inline `left`/`top`/`width`/`height`. The theme only changes padding, color, border, radius and inner sizes. To make the icon bar narrower, the sidebar panel moves left by the difference and grows by the same amount, so it still meets the presentation.
+- The narrower icon bar only applies on screens with a mouse (`pointer: fine`, at least 768px wide). On phones the client uses a different width (48px), so the bar is left alone there.
+- Selectors use `data-test` attributes and ids, because styled-components class names change on every client build.
+- Icons replace the `::before` glyph of the `icon-bbb-*` classes with an SVG used as a mask, so they still follow the text color.
+
+Tested on BigBlueButton 4.0.0 with plugin SDK `1.0.0-beta`.
+
+## License
+
+MIT, see [LICENSE](LICENSE). Icons are from [Lucide](https://lucide.dev), ISC license, see [src/icons/LICENSE](src/icons/LICENSE).

@@ -1,0 +1,29 @@
+{
+  "name": "bbb-plugin-flat-theme",
+  "version": "0.1.0",
+  "description": "BigBlueButton plugin that applies a flat theme to the HTML5 client: full-height sidebars, no rounded panels and clearer icons.",
+  "private": true,
+  "license": "MIT",
+  "main": "./src/index.tsx",
+  "scripts": {
+    "build-bundle": "webpack --mode production",
+    "start": "webpack serve --mode development"
+  },
+  "dependencies": {
+    "bigbluebutton-html-plugin-sdk": "^1.0.0-beta.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "copy-webpack-plugin": "^12.0.2",
+    "css-loader": "^6.7.4",
+    "style-loader": "^3.3.3",
+    "ts-loader": "^9.4.3",
+    "typescript": "^5.1.6",
+    "webpack": "^5.83.1",
+    "webpack-cli": "^5.1.1",
+    "webpack-dev-server": "^4.15.1"
+  }
+}

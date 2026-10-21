@@ -1,0 +1,400 @@
+/*
+ * Flat theme for the BigBlueButton 4.0 HTML5 client.
+ *
+ * The client positions the main blocks (icon bar, sidebar panel, presentation,
+ * action bar) in JS with inline left/top/width/height, so this file only
+ * touches padding, color, border, radius and inner sizes. Selectors rely on
+ * data-test attributes and ids because styled-components class names change on
+ * every client build.
+ */
+
+:root {
+  --theme-background: #102133;
+  --theme-nav: #133459;
+  --theme-nav-active: #1E4877;
+  --theme-primary: #0F70D7;
+  --theme-line: #E3E4E8;
+  --theme-text: #1f2329;
+  /* Icon bar width. The client computes 60px + 2% of the window in JS */
+  --theme-nav-width: 72px;
+  --theme-nav-excess: calc(60px + 2vw - var(--theme-nav-width));
+}
+
+/* Background behind the presentation, top bar and action bar */
+body,
+#layout > div:not([data-test]),
+#Navbar,
+#ActionsBar {
+  background-color: var(--theme-background) !important;
+}
+
+#layout {
+  padding-top: 0 !important;
+}
+
+/* ---------- Icon bar (navigation sidebar) ---------- */
+
+#layout > div:has(> [data-test="navigationSidebarContainer"]) {
+  padding: 0 !important;
+  background: var(--theme-nav) !important;
+}
+
+[data-test="navigationSidebarContainer"] {
+  height: 100% !important;
+  padding: 0 0 16px !important;
+  border-radius: 0 !important;
+  background: var(--theme-nav) !important;
+}
+
+[data-test="navigationSidebarContainer"] > div {
+  border-radius: 0 !important;
+}
+
+[data-test="brandingArea"] {
+  display: flex;
+  justify-content: center;
+  padding: 16px 0 !important;
+}
+
+/* Logo on a white tile, so any logo reads well on the dark bar */
+[data-test="brandingArea"] img {
+  width: 56px;
+  max-height: 56px;
+  padding: 6px;
+  box-sizing: border-box;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 8px;
+}
+
+[data-test="navigationSidebarContainer"] hr {
+  border-color: rgba(255, 255, 255, .15) !important;
+  background: rgba(255, 255, 255, .15) !important;
+}
+
+[data-test="navigationSidebarContainer"] div[role="button"] {
+  width: 48px !important;
+  height: 48px !important;
+  margin: 4px auto !important;
+  border-radius: 10px !important;
+  color: #fff !important;
+  background: transparent !important;
+}
+
+[data-test="navigationSidebarContainer"] div[role="button"] i {
+  color: #fff !important;
+  font-size: 22px !important;
+}
+
+[data-test="navigationSidebarContainer"] div[role="button"]:hover {
+  background: rgba(255, 255, 255, .08) !important;
+}
+
+[data-test="navigationSidebarContainer"] div[role="button"][aria-expanded="true"] {
+  background: var(--theme-nav-active) !important;
+}
+
+/* Marker on the right edge of the active item (half of the space beside the button) */
+[data-test="navigationSidebarContainer"] div[role="button"][aria-expanded="true"]::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: calc((48px - var(--theme-nav-width)) / 2);
+  width: 5px;
+  background: var(--theme-primary);
+}
+
+/*
+ * Narrower icon bar: the client places the sidebar panel right after the width
+ * it computed, so the panel moves left by the excess and grows by the same
+ * amount on the right. Only on mouse screens: phones use another width (48px).
+ */
+@media (pointer: fine) and (min-width: 768px) {
+  #layout > div:has(> [data-test="navigationSidebarContainer"]) {
+    width: var(--theme-nav-width) !important;
+  }
+
+  #layout > div:has(> [data-test="sidebarContentMain"]) {
+    margin-left: calc(-1 * var(--theme-nav-excess));
+    box-sizing: content-box !important;
+    padding-right: var(--theme-nav-excess) !important;
+  }
+
+  #layout > div:has(> [data-test="sidebarContentMain"]) [data-test="sidebarContentMain"] {
+    width: calc(100% + var(--theme-nav-excess)) !important;
+  }
+}
+
+/* ---------- Sidebar panel (chat, users, notes...) ---------- */
+
+#layout > div:has(> [data-test="sidebarContentMain"]) {
+  padding: 0 !important;
+  background: #fff !important;
+}
+
+[data-test="sidebarContentMain"] {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+}
+
+[data-test="sidebarContentMain"],
+[data-test="sidebarContentMain"] > div {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+[data-test="sidebarContentMain"] header {
+  display: flex;
+  align-items: center;
+  min-height: 64px;
+  box-sizing: border-box;
+  padding: 0 12px 0 20px !important;
+  border-bottom: 1px solid var(--theme-line);
+}
+
+[data-test="sidebarContentMain"] header h2 {
+  text-transform: none !important;
+  font-size: 1.2rem !important;
+  font-weight: 500 !important;
+  color: var(--theme-text) !important;
+}
+
+[data-test="sidebarContentMain"] header + hr {
+  display: none !important;
+}
+
+/* Chat */
+#scroll-box {
+  padding: 0 !important;
+}
+
+#chat-list {
+  padding: 16px 16px 8px !important;
+}
+
+[data-test="chatReplyIntentionContainer"] {
+  margin: 0 16px;
+}
+
+[data-test="sidebarContentMain"] form {
+  margin: 0 !important;
+  padding: 12px 16px 16px;
+  border-top: 1px solid var(--theme-line);
+  background: #fff;
+}
+
+[data-test="sidebarContentMain"] form > div > div {
+  border: 1px solid #D5D8DD !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+[data-test="sidebarContentMain"] form > div > div:focus-within {
+  border-color: var(--theme-primary) !important;
+}
+
+#message-input {
+  font-size: 1rem !important;
+}
+
+/* Send: icon only, no filled square */
+[data-test="sendMessageButton"] {
+  background: transparent !important;
+}
+
+[data-test="sendMessageButton"] svg,
+[data-test="sendMessageButton"] svg * {
+  fill: #6b7280 !important;
+}
+
+[data-test="sendMessageButton"]:hover svg,
+[data-test="sendMessageButton"]:hover svg * {
+  fill: var(--theme-primary) !important;
+}
+
+/* Users: search box with some room */
+[data-test="userListPanel"] > div:has(> input) {
+  margin: 16px !important;
+  border-radius: 8px !important;
+}
+
+/* ---------- Action bar (microphone, camera...) ---------- */
+
+#ActionsBar button > span[color]:first-child {
+  width: 56px !important;
+  height: 56px !important;
+}
+
+#ActionsBar button > span[color]:first-child > i {
+  font-size: 24px !important;
+}
+
+#ActionsBar button > span[color="primary"] {
+  background: var(--theme-primary) !important;
+  color: #fff !important;
+}
+
+#ActionsBar button > span[color="primary"] i {
+  color: #fff !important;
+}
+
+/* ---------- Icons (Lucide, ISC, see icons/LICENSE) ----------
+ * Replaces the bbb-icons font glyph with an SVG used as a mask, so the icon
+ * still takes the text color (currentColor). Only in the icon bar and in the
+ * action bar; icons elsewhere keep the client defaults.
+ */
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) :is(
+  .icon-bbb-mute,
+  .icon-bbb-unmute,
+  .icon-bbb-listen,
+  .icon-bbb-audio_on,
+  .icon-bbb-audio_off,
+  .icon-bbb-no_audio,
+  .icon-bbb-video,
+  .icon-bbb-video_off,
+  .icon-bbb-desktop,
+  .icon-bbb-desktop_off,
+  .icon-bbb-reactions,
+  .icon-bbb-happy,
+  .icon-bbb-hand,
+  .icon-bbb-hand_off,
+  .icon-bbb-presentation,
+  .icon-bbb-presentation_off,
+  .icon-bbb-profile,
+  .icon-bbb-user_list,
+  .icon-bbb-group_chat,
+  .icon-bbb-shared_notes,
+  .icon-bbb-widgets,
+  .icon-bbb-rooms,
+  .icon-bbb-polling,
+  .icon-bbb-time,
+  .icon-bbb-learning_dashboard,
+  .icon-bbb-settings
+)::before {
+  content: "" !important;
+  display: block;
+  width: 1em;
+  height: 1em;
+  background-color: currentColor;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+/* Action bar */
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-mute::before {
+  -webkit-mask-image: url(./icons/mic-off.svg);
+  mask-image: url(./icons/mic-off.svg);
+}
+
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-unmute::before {
+  -webkit-mask-image: url(./icons/mic.svg);
+  mask-image: url(./icons/mic.svg);
+}
+
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-listen::before,
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-audio_on::before {
+  -webkit-mask-image: url(./icons/headphones.svg);
+  mask-image: url(./icons/headphones.svg);
+}
+
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-audio_off::before,
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-no_audio::before {
+  -webkit-mask-image: url(./icons/headphone-off.svg);
+  mask-image: url(./icons/headphone-off.svg);
+}
+
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-video::before {
+  -webkit-mask-image: url(./icons/video.svg);
+  mask-image: url(./icons/video.svg);
+}
+
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-video_off::before {
+  -webkit-mask-image: url(./icons/video-off.svg);
+  mask-image: url(./icons/video-off.svg);
+}
+
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-desktop::before {
+  -webkit-mask-image: url(./icons/screen-share.svg);
+  mask-image: url(./icons/screen-share.svg);
+}
+
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-desktop_off::before {
+  -webkit-mask-image: url(./icons/screen-share-off.svg);
+  mask-image: url(./icons/screen-share-off.svg);
+}
+
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-reactions::before,
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-happy::before {
+  -webkit-mask-image: url(./icons/smile-plus.svg);
+  mask-image: url(./icons/smile-plus.svg);
+}
+
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-hand::before,
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-hand_off::before {
+  -webkit-mask-image: url(./icons/hand.svg);
+  mask-image: url(./icons/hand.svg);
+}
+
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-presentation::before,
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-presentation_off::before {
+  -webkit-mask-image: url(./icons/presentation.svg);
+  mask-image: url(./icons/presentation.svg);
+}
+
+
+/* Icon bar */
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-profile::before {
+  -webkit-mask-image: url(./icons/user-round-cog.svg);
+  mask-image: url(./icons/user-round-cog.svg);
+}
+
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-user_list::before {
+  -webkit-mask-image: url(./icons/users.svg);
+  mask-image: url(./icons/users.svg);
+}
+
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-group_chat::before {
+  -webkit-mask-image: url(./icons/messages-square.svg);
+  mask-image: url(./icons/messages-square.svg);
+}
+
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-shared_notes::before {
+  -webkit-mask-image: url(./icons/notebook-pen.svg);
+  mask-image: url(./icons/notebook-pen.svg);
+}
+
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-widgets::before {
+  -webkit-mask-image: url(./icons/layout-grid.svg);
+  mask-image: url(./icons/layout-grid.svg);
+}
+
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-rooms::before {
+  -webkit-mask-image: url(./icons/door-open.svg);
+  mask-image: url(./icons/door-open.svg);
+}
+
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-polling::before {
+  -webkit-mask-image: url(./icons/chart-column.svg);
+  mask-image: url(./icons/chart-column.svg);
+}
+
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-time::before {
+  -webkit-mask-image: url(./icons/timer.svg);
+  mask-image: url(./icons/timer.svg);
+}
+
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-learning_dashboard::before {
+  -webkit-mask-image: url(./icons/chart-no-axes-combined.svg);
+  mask-image: url(./icons/chart-no-axes-combined.svg);
+}
+
+:is(#ActionsBar, [data-test="navigationSidebarContainer"]) .icon-bbb-settings::before {
+  -webkit-mask-image: url(./icons/settings.svg);
+  mask-image: url(./icons/settings.svg);
+}
