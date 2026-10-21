@@ -1,6 +1,6 @@
 {
   "name": "bbb-plugin-flat-theme",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "BigBlueButton plugin that applies a flat theme to the HTML5 client: full-height sidebars, no rounded panels and clearer icons.",
   "private": true,
   "license": "MIT",

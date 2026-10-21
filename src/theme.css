@@ -271,7 +271,9 @@ body,
  * first layer, because the avatar's own ::before and ::after are used by the
  * client (presenter and talking indicators).
  */
-[data-test="moderatorAvatar"] {
+/* The photo (avatarURL) is an <img> with its own small radius */
+[data-test="moderatorAvatar"],
+[data-test="moderatorAvatar"] img {
   border-radius: 50% !important;
 }
 
