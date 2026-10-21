@@ -13,6 +13,8 @@
   --theme-nav: #133459;
   --theme-nav-active: #1E4877;
   --theme-primary: #0F70D7;
+  --theme-danger: #D93025;
+  --theme-moderator: #F5B700;
   --theme-line: #E3E4E8;
   --theme-text: #1f2329;
   /* Icon bar width. The client computes 60px + 2% of the window in JS */
@@ -191,8 +193,15 @@ body,
   box-shadow: none !important;
 }
 
+/* Focus highlights the whole input box, not just the textarea inside it */
 [data-test="sidebarContentMain"] form > div > div:focus-within {
   border-color: var(--theme-primary) !important;
+  box-shadow: 0 0 0 3px rgba(15, 112, 215, .18) !important;
+}
+
+#message-input:focus,
+#message-input:focus-visible {
+  outline: none !important;
 }
 
 #message-input {
@@ -202,6 +211,7 @@ body,
 /* Send: icon only, no filled square */
 [data-test="sendMessageButton"] {
   background: transparent !important;
+  box-shadow: none !important;
 }
 
 [data-test="sendMessageButton"] svg,
@@ -212,6 +222,38 @@ body,
 [data-test="sendMessageButton"]:hover svg,
 [data-test="sendMessageButton"]:hover svg * {
   fill: var(--theme-primary) !important;
+}
+
+/* Thin, quiet scrollbars in the panels */
+[data-test="sidebarContentMain"],
+[data-test="sidebarContentMain"] * {
+  scrollbar-width: thin;
+  scrollbar-color: #C5CBD3 transparent;
+}
+
+/*
+ * Avatars: the client tells moderators apart by a square avatar. Here every
+ * avatar is round and moderators get a small gold crown on the top right
+ * corner instead, clear of the initials. The badge sits on the avatar's empty
+ * first layer, because the avatar's own ::before and ::after are used by the
+ * client (presenter and talking indicators).
+ */
+[data-test="moderatorAvatar"] {
+  border-radius: 50% !important;
+}
+
+[data-test="moderatorAvatar"] > div:first-child::after {
+  content: "";
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  z-index: 2;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--theme-moderator) url(./icons/crown-badge.svg) center / 8px no-repeat;
+  box-shadow: 0 0 0 1.5px #fff;
+  pointer-events: none;
 }
 
 /* Users: search box with some room */
@@ -256,6 +298,49 @@ body,
   color: #fff !important;
 }
 
+/* Soft hover, like the icon bar */
+#ActionsBar button > span[color]:first-child,
+[data-test="navigationSidebarContainer"] div[role="button"] {
+  transition: background-color .12s ease, color .12s ease;
+}
+
+#ActionsBar button:hover > span[color="default"]:first-child {
+  background: #E6EBF2 !important;
+}
+
+/* Muted microphone and camera off in red, so "I am muted" reads at a glance */
+:is([data-test="unmuteMicButton"], [data-test="joinVideo"]) > span[color="default"] i {
+  color: var(--theme-danger) !important;
+}
+
+/* ---------- Presentation ---------- */
+
+[data-test="presentationContainer"] > div:nth-child(2),
+#whiteboard-element > div:first-child {
+  border-radius: 10px !important;
+}
+
+/* ---------- Cameras ---------- */
+
+/* Fill the tile like Meet does, instead of black bars above and below the video */
+[data-test="webcamItem"] video {
+  object-fit: cover !important;
+}
+
+/* Presenter badge on the top left of the presenter's camera */
+div:has(> [data-test="presenterVideoButton"]) {
+  border-radius: 6px !important;
+  background: rgba(0, 0, 0, .6) !important;
+}
+
+/* Name tag readable over any video */
+[data-test="dropdownWebcamButton"] {
+  border-radius: 6px !important;
+  background: rgba(0, 0, 0, .6) !important;
+  font-size: 12px !important;
+  line-height: 20px !important;
+}
+
 /* ---------- Every other button and field: 8px corners ----------
  * The client's Button component uses 14px (text buttons), 42px (capsules like
  * "Start recording") or 50% (icon buttons). The action bar and icon bar rules
@@ -269,8 +354,39 @@ textarea,
 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
 [data-test="timeIndicator"],
 [data-test="remove-reaction"],
-div:has(> [data-test="increaseRooms"]) {
+div:has(> [data-test="increaseRooms"]),
+:is([data-test="userListItem"], [data-test="userListItemCurrent"]) > div:has(> div[data-test]) {
   border-radius: 8px !important;
+}
+
+/* ---------- Notifications ---------- */
+
+.Toastify__toast {
+  border-radius: 8px !important;
+  box-shadow: 0 4px 16px rgba(16, 33, 51, .16) !important;
+}
+
+/* ---------- Accessibility ---------- */
+
+/*
+ * Visible focus ring, only for keyboard navigation. Text fields are left out:
+ * they match :focus-visible on a mouse click too, and the chat box already
+ * highlights its whole container.
+ */
+:is(button, [role="button"], a, select, [role="tab"], [role="menuitem"]):focus-visible {
+  outline: 2px solid var(--theme-primary) !important;
+  outline-offset: 2px !important;
+}
+
+/* Respect the system "reduce motion" setting */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
 
 /* ---------- Icons (Lucide, ISC, see icons/LICENSE) ----------
