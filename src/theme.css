@@ -165,8 +165,8 @@ body,
   display: none !important;
 }
 
-/* Chat */
-#scroll-box {
+/* Chat (other panels, like polls, also use #scroll-box and keep their padding) */
+#scroll-box:has(#chat-list) {
   padding: 0 !important;
 }
 
@@ -222,25 +222,27 @@ body,
 
 /* ---------- Action bar (microphone, camera...) ---------- */
 
-/* Same shape as the icon bar buttons: 48px with 10px corners */
+/* 40px controls with 20px icons (the size Meet uses), 10px corners like the icon bar */
 #ActionsBar button > span[color]:first-child {
-  width: 48px !important;
-  height: 48px !important;
+  width: 40px !important;
+  height: 40px !important;
   border-radius: 10px !important;
 }
 
 #ActionsBar button > span[color]:first-child > i {
-  font-size: 22px !important;
+  font-size: 20px !important;
 }
 
-/* Presentation / media area: keep the single capsule, just squarer */
+/* Presentation / media area: keep the single capsule, same height as the other buttons */
 #ActionsBar div:has(> [data-test="mediaAreaButton"]) {
+  height: 40px !important;
   align-items: center;
   overflow: hidden;
   border-radius: 10px !important;
 }
 
 #ActionsBar div:has(> [data-test="mediaAreaButton"]) button > span[color]:first-child {
+  width: 44px !important;
   border-radius: 0 !important;
   background: transparent !important;
 }
@@ -254,14 +256,20 @@ body,
   color: #fff !important;
 }
 
-/* ---------- Other buttons: rounded squares instead of circles ---------- */
-
-:is(#Navbar, [data-test="sidebarContentMain"], [data-test="presentationContainer"]) button > span[color]:first-child,
-[data-test="connectionStatusButton"] > span:first-child,
-[data-test="leaveMeetingDropdown"],
-[data-test="whiteboardOptionsButton"],
-.tlui-undo,
-.tlui-redo {
+/* ---------- Every other button and field: 8px corners ----------
+ * The client's Button component uses 14px (text buttons), 42px (capsules like
+ * "Start recording") or 50% (icon buttons). The action bar and icon bar rules
+ * above are more specific and keep their 10px. The small audio device arrow on
+ * the microphone stays round, and toggle switches are not buttons.
+ */
+button:not([data-test="audioDropdownMenu"]),
+button > span[color]:first-child,
+select,
+textarea,
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+[data-test="timeIndicator"],
+[data-test="remove-reaction"],
+div:has(> [data-test="increaseRooms"]) {
   border-radius: 8px !important;
 }
 
