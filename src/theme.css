@@ -41,9 +41,10 @@ body,
   background: var(--theme-nav) !important;
 }
 
+/* No padding here: on phones the closed bar has zero height and padding would leave a strip */
 [data-test="navigationSidebarContainer"] {
   height: 100% !important;
-  padding: 0 0 16px !important;
+  padding: 0 !important;
   border-radius: 0 !important;
   background: var(--theme-nav) !important;
 }
@@ -74,9 +75,41 @@ body,
   background: rgba(255, 255, 255, .15) !important;
 }
 
+/*
+ * The bar is a size container, so buttons and the active marker follow its
+ * real width: 72px on desktop, 48px on phones (where the client overlays it).
+ */
+[data-test="navigationSidebarContainer"] {
+  container-type: inline-size;
+  --theme-nav-button: min(48px, calc(100cqw - 8px));
+}
+
+/*
+ * The scrolling list uses the client's "scroll shadow" (white gradients with
+ * background-attachment: local), made for its white bar. Redrawn in the bar
+ * color, otherwise white bands show at the top and bottom when scrolling.
+ * No sideways scroll and no visible scrollbar: on phones they ate the width.
+ */
+[data-test="navigationSidebarContainer"] > div {
+  padding-bottom: 16px !important;
+  box-sizing: border-box;
+  overflow-x: hidden !important;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  background-image:
+    linear-gradient(var(--theme-nav) 30%, transparent),
+    linear-gradient(transparent, var(--theme-nav) 70%),
+    radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, .35), transparent),
+    radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, .35), transparent) !important;
+}
+
+[data-test="navigationSidebarContainer"] > div::-webkit-scrollbar {
+  display: none;
+}
+
 [data-test="navigationSidebarContainer"] div[role="button"] {
-  width: 48px !important;
-  height: 48px !important;
+  width: var(--theme-nav-button) !important;
+  height: var(--theme-nav-button) !important;
   margin: 4px auto !important;
   border-radius: 10px !important;
   color: #fff !important;
@@ -96,14 +129,14 @@ body,
   background: var(--theme-nav-active) !important;
 }
 
-/* Marker on the right edge of the active item (half of the space beside the button) */
+/* Marker on the right edge of the bar, beside the active item */
 [data-test="navigationSidebarContainer"] div[role="button"][aria-expanded="true"]::after {
   content: "";
   position: absolute;
   top: 0;
   bottom: 0;
-  right: calc((48px - var(--theme-nav-width)) / 2);
-  width: 5px;
+  right: calc((var(--theme-nav-button) - 100cqw) / 2);
+  width: 4px;
   background: var(--theme-primary);
 }
 

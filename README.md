@@ -26,6 +26,7 @@ _Camera images in the screenshots are illustrations._
 - Narrower: 72px instead of the client's `60px + 2% of the window`.
 - 48px buttons with white icons. The active item gets a lighter background and a marker on the right edge.
 - The logo (when there is one) sits on a white tile, so any logo reads well on the dark bar.
+- On phones, where the client overlays a 48px bar, buttons shrink to 40px and the list scrolls only vertically, with the scroll shadow drawn in the bar color.
 
 **Sidebar panel (chat, users, notes...)**
 - Flush with the icon bar and full height: no padding, no rounded corners, no shadow.
