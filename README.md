@@ -14,7 +14,7 @@ The same meeting, same window, with and without the theme.
 
 | After (with this plugin) |
 |---|
-| ![After](docs/after.jpg) |
+| ![After, with the main changes numbered](docs/after-annotated.jpg) |
 
 
 _Camera images in the screenshots are illustrations._
