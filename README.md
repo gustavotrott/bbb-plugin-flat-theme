@@ -8,9 +8,14 @@ A theme plugin for the BigBlueButton 4.0 HTML5 client. It is pure CSS shipped as
 
 The same meeting, same window, with and without the theme.
 
-| Before (default client) | After (with this plugin) |
-|---|---|
-| ![Before](docs/before.jpg) | ![After](docs/after.jpg) |
+| Before (default client) |
+|---|
+| ![Before](docs/before.jpg) |
+
+| After (with this plugin) |
+|---|
+| ![After](docs/after.jpg) |
+
 
 _Camera images in the screenshots are illustrations._
 
