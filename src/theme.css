@@ -350,7 +350,8 @@ body,
   background: transparent !important;
 }
 
-#ActionsBar button > span[color="primary"] {
+#ActionsBar button > span[color="primary"],
+#ActionsBar div:has(> [data-test="mediaAreaButton"]) button > span[color="primary"]:first-child {
   background: var(--theme-primary) !important;
   color: #fff !important;
 }
