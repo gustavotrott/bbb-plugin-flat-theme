@@ -598,10 +598,15 @@ div:has(> [data-test="increaseRooms"]),
   mask-image: url(./icons/hand.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-presentation::before,
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-presentation_off::before {
+:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-presentation::before {
   -webkit-mask-image: url(./icons/presentation.svg);
   mask-image: url(./icons/presentation.svg);
+}
+
+/* Minimized presentation (the "restore" button): crossed, like mic and camera off */
+:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-presentation_off::before {
+  -webkit-mask-image: url(./icons/presentation-off.svg);
+  mask-image: url(./icons/presentation-off.svg);
 }
 
 

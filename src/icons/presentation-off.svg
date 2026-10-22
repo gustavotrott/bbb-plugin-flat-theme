@@ -1,0 +1,19 @@
+<!-- Based on lucide-static v0.460.0 presentation - ISC, with the slash of the "-off" icons -->
+<svg
+  class="lucide lucide-presentation-off"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M7 3h15" />
+  <path d="M21 3v11a2 2 0 0 1-2 2h-1.5" />
+  <path d="M14.5 16H5a2 2 0 0 1-2-2V7" />
+  <path d="m7 21 5-5 5 5" />
+  <path d="m2 2 20 20" />
+</svg>

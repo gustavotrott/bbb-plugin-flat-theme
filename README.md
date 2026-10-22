@@ -66,7 +66,7 @@ _Camera images in the screenshots are illustrations._
 **Icons**
 - The icon bar and the action bar use [Lucide](https://lucide.dev) icons instead of the `bbb-icons` font: microphone, camera, screen share, reactions, raise hand, profile settings, users, chat, notes, apps, breakout rooms, polls, timer, learning dashboard and settings.
 - The user list (row buttons, search, download) and the dropdown menus (user options, audio devices, options, presentation) use them too. "Make moderator" shows the same crown the moderator avatars get, "Remove user" a user with an x, "End meeting" a power icon.
-- Icons keep showing the state, like the client does: a crossed microphone when muted, a crossed camera when it is off, a crossed screen when not sharing.
+- Icons keep showing the state, like the client does: a crossed microphone when muted, a crossed camera when it is off, a crossed screen when not sharing, a crossed presentation when it is minimized.
 - Icons elsewhere keep the client defaults.
 
 ## Install
