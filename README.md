@@ -36,7 +36,7 @@ _Camera images in the screenshots are illustrations._
 **Action bar**
 - 40px buttons (the size Meet uses) with 10px corners and 20px icons, the same shape as the icon bar buttons. Active buttons (microphone on, hand raised...) are blue with a white icon.
 - Muted microphone and camera off show a red icon, so "I am muted" reads at a glance.
-- Soft hover on the action and icon bar buttons.
+- Soft hover on the action and icon bar buttons, keeping the icon dark (the client turns it white for its darker hover).
 - The presentation and media area buttons stay together in a single capsule, with the same height and corners.
 
 **Cameras**
@@ -45,6 +45,10 @@ _Camera images in the screenshots are illustrations._
 
 **Avatars**
 - The client tells moderators apart by a square avatar. Here every avatar is round and moderators get a small gold crown on the top right corner instead, clear of the initials.
+- In the user list, the presenter gets a small blue presentation badge on the bottom right corner. The chat does not get it: its messages carry no user id, only the avatar color, which can repeat.
+
+**Top bar**
+- The options button (top right) shows a menu icon on a light tile, matching the connection and leave buttons beside it, instead of three bare dots.
 
 **Presentation and notifications**
 - The presentation area uses 10px corners, like the cameras and the action bar.
@@ -61,8 +65,9 @@ _Camera images in the screenshots are illustrations._
 
 **Icons**
 - The icon bar and the action bar use [Lucide](https://lucide.dev) icons instead of the `bbb-icons` font: microphone, camera, screen share, reactions, raise hand, profile settings, users, chat, notes, apps, breakout rooms, polls, timer, learning dashboard and settings.
+- The user list (row buttons, search, download) and the dropdown menus (user options, audio devices, options, presentation) use them too. "Make moderator" shows the same crown the moderator avatars get, "Remove user" a user with an x, "End meeting" a power icon.
 - Icons keep showing the state, like the client does: a crossed microphone when muted, a crossed camera when it is off, a crossed screen when not sharing.
-- Icons elsewhere (user list, menus) keep the client defaults.
+- Icons elsewhere keep the client defaults.
 
 ## Install
 
@@ -110,7 +115,7 @@ Change them and rebuild.
 
 ## How it works
 
-The plugin imports `src/theme.css` through `style-loader`, which injects it into `<head>` when the bundle loads. SVG icons are inlined as data URIs, so the plugin is a single JS file. The React component only calls `BbbPluginSdk.initialize()` so the client reports the plugin as loaded.
+The plugin imports `src/theme.css` through `style-loader`, which injects it into `<head>` when the bundle loads. SVG icons are inlined as data URIs, so the plugin is a single JS file. The React component registers the plugin and does one thing CSS cannot: the client does not mark the presenter's avatar, so the component reads the user list from the SDK (`useUsersBasicInfo`) and sets `--theme-presenter-badge` on the presenter's user list row, by its `data-id`. The badge itself is drawn in `theme.css`.
 
 Some details worth knowing if you change the CSS:
 
