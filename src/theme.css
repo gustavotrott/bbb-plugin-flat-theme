@@ -357,9 +357,15 @@ body,
 
 /* ---------- Cameras ---------- */
 
-/* Fill the tile like Meet does, instead of black bars above and below the video */
-[data-test="webcamItem"] video {
+/* Fill the tile like Meet does, instead of black bars above and below the video.
+   The tile is "webcamItemTalkingUser" while the person speaks. */
+:is([data-test="webcamItem"], [data-test="webcamItemTalkingUser"]) video {
   object-fit: cover !important;
+}
+
+/* Fullscreen shows the whole image, nothing cropped */
+:fullscreen video {
+  object-fit: contain !important;
 }
 
 /* Presenter badge on the top left of the presenter's camera */

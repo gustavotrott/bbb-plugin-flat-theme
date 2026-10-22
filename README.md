@@ -40,7 +40,7 @@ _Camera images in the screenshots are illustrations._
 - The presentation and media area buttons stay together in a single capsule, with the same height and corners.
 
 **Cameras**
-- Videos fill their tile (`object-fit: cover`, like Meet) instead of showing black bars above and below.
+- Videos fill their tile (`object-fit: cover`, like Meet) instead of showing black bars above and below, also while the person is speaking. In fullscreen the whole image is shown, without cropping.
 - The name tag over each video gets a darker background and slightly larger text, and the presenter badge gets the same treatment.
 
 **Avatars**
