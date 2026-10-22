@@ -2,6 +2,8 @@
 
 A theme plugin for the BigBlueButton 4.0 HTML5 client. It is pure CSS shipped as a plugin: no client rebuild, no `customStyleUrl`, no extra files to host besides the plugin itself.
 
+> **Branch `bbb-static-classes`:** this branch styles the client through static `bbb-*` classes (`bbb-avatar--presenter`, `bbb-navigation__item--active`...) instead of `data-test` attributes and DOM structure, and drops the JS that marked the presenter. Those classes are not in the stock BigBlueButton client yet, so this branch only works on a client built with them. Use `main` on a stock client.
+
 ![Flat theme on BigBlueButton 4.0](docs/after.jpg)
 
 ## Before and after

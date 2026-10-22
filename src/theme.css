@@ -3,9 +3,11 @@
  *
  * The client positions the main blocks (icon bar, sidebar panel, presentation,
  * action bar) in JS with inline left/top/width/height, so this file only
- * touches padding, color, border, radius and inner sizes. Selectors rely on
- * data-test attributes and ids because styled-components class names change on
- * every client build.
+ * touches padding, color, border, radius and inner sizes.
+ *
+ * This branch targets a client with the static `bbb-*` classes (block,
+ * block__element, block--state). The main branch keeps the data-test and
+ * structural selectors that work on the stock client.
  */
 
 :root {
@@ -25,8 +27,8 @@
 /* Background behind the presentation, top bar and action bar */
 body,
 #layout > div:not([data-test]),
-#Navbar,
-#ActionsBar {
+.bbb-navbar,
+.bbb-actions-bar {
   background-color: var(--theme-background) !important;
 }
 
@@ -36,31 +38,31 @@ body,
 
 /* ---------- Icon bar (navigation sidebar) ---------- */
 
-#layout > div:has(> [data-test="navigationSidebarContainer"]) {
+.bbb-navigation {
   padding: 0 !important;
   background: var(--theme-nav) !important;
 }
 
 /* No padding here: on phones the closed bar has zero height and padding would leave a strip */
-[data-test="navigationSidebarContainer"] {
+.bbb-navigation__bar {
   height: 100% !important;
   padding: 0 !important;
   border-radius: 0 !important;
   background: var(--theme-nav) !important;
 }
 
-[data-test="navigationSidebarContainer"] > div {
+.bbb-navigation__list {
   border-radius: 0 !important;
 }
 
-[data-test="brandingArea"] {
+.bbb-navigation__logo {
   display: flex;
   justify-content: center;
   padding: 16px 0 !important;
 }
 
 /* Logo on a white tile, so any logo reads well on the dark bar */
-[data-test="brandingArea"] img {
+.bbb-navigation__logo img {
   width: 56px;
   max-height: 56px;
   padding: 6px;
@@ -70,7 +72,7 @@ body,
   border-radius: 8px;
 }
 
-[data-test="navigationSidebarContainer"] hr {
+.bbb-navigation__separator {
   border-color: rgba(255, 255, 255, .15) !important;
   background: rgba(255, 255, 255, .15) !important;
 }
@@ -79,7 +81,7 @@ body,
  * The bar is a size container, so buttons and the active marker follow its
  * real width: 72px on desktop, 48px on phones (where the client overlays it).
  */
-[data-test="navigationSidebarContainer"] {
+.bbb-navigation__bar {
   container-type: inline-size;
   --theme-nav-button: min(48px, calc(100cqw - 8px));
 }
@@ -90,7 +92,7 @@ body,
  * color, otherwise white bands show at the top and bottom when scrolling.
  * No sideways scroll and no visible scrollbar: on phones they ate the width.
  */
-[data-test="navigationSidebarContainer"] > div {
+.bbb-navigation__list {
   padding-bottom: 16px !important;
   box-sizing: border-box;
   overflow-x: hidden !important;
@@ -103,11 +105,11 @@ body,
     radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, .35), transparent) !important;
 }
 
-[data-test="navigationSidebarContainer"] > div::-webkit-scrollbar {
+.bbb-navigation__list::-webkit-scrollbar {
   display: none;
 }
 
-[data-test="navigationSidebarContainer"] div[role="button"] {
+.bbb-navigation__item {
   width: var(--theme-nav-button) !important;
   height: var(--theme-nav-button) !important;
   margin: 4px auto !important;
@@ -116,21 +118,21 @@ body,
   background: transparent !important;
 }
 
-[data-test="navigationSidebarContainer"] div[role="button"] i {
+.bbb-navigation__item i {
   color: #fff !important;
   font-size: 22px !important;
 }
 
-[data-test="navigationSidebarContainer"] div[role="button"]:hover {
+.bbb-navigation__item:hover {
   background: rgba(255, 255, 255, .08) !important;
 }
 
-[data-test="navigationSidebarContainer"] div[role="button"][aria-expanded="true"] {
+.bbb-navigation__item--active {
   background: var(--theme-nav-active) !important;
 }
 
 /* Marker on the right edge of the bar, beside the active item */
-[data-test="navigationSidebarContainer"] div[role="button"][aria-expanded="true"]::after {
+.bbb-navigation__item--active::after {
   content: "";
   position: absolute;
   top: 0;
@@ -146,41 +148,41 @@ body,
  * amount on the right. Only on mouse screens: phones use another width (48px).
  */
 @media (pointer: fine) and (min-width: 768px) {
-  #layout > div:has(> [data-test="navigationSidebarContainer"]) {
+  .bbb-navigation {
     width: var(--theme-nav-width) !important;
   }
 
-  #layout > div:has(> [data-test="sidebarContentMain"]) {
+  .bbb-sidebar-content {
     margin-left: calc(-1 * var(--theme-nav-excess));
     box-sizing: content-box !important;
     padding-right: var(--theme-nav-excess) !important;
   }
 
-  #layout > div:has(> [data-test="sidebarContentMain"]) [data-test="sidebarContentMain"] {
+  .bbb-sidebar-content .bbb-sidebar-content__panel {
     width: calc(100% + var(--theme-nav-excess)) !important;
   }
 }
 
 /* ---------- Sidebar panel (chat, users, notes...) ---------- */
 
-#layout > div:has(> [data-test="sidebarContentMain"]) {
+.bbb-sidebar-content {
   padding: 0 !important;
   background: #fff !important;
 }
 
-[data-test="sidebarContentMain"] {
+.bbb-sidebar-content__panel {
   width: 100% !important;
   height: 100% !important;
   max-height: none !important;
 }
 
-[data-test="sidebarContentMain"],
-[data-test="sidebarContentMain"] > div {
+.bbb-sidebar-content__panel,
+.bbb-sidebar-content__panel > div {
   border-radius: 0 !important;
   box-shadow: none !important;
 }
 
-[data-test="sidebarContentMain"] header {
+.bbb-panel-header {
   display: flex;
   align-items: center;
   min-height: 64px;
@@ -189,19 +191,19 @@ body,
   border-bottom: 1px solid var(--theme-line);
 }
 
-[data-test="sidebarContentMain"] header h2 {
+.bbb-panel-header__title {
   text-transform: none !important;
   font-size: 1.2rem !important;
   font-weight: 500 !important;
   color: var(--theme-text) !important;
 }
 
-[data-test="sidebarContentMain"] header + hr {
+.bbb-panel-header + hr {
   display: none !important;
 }
 
 /* Chat (other panels, like polls, also use #scroll-box and keep their padding) */
-#scroll-box:has(#chat-list) {
+.bbb-chat {
   padding: 0 !important;
 }
 
@@ -213,21 +215,21 @@ body,
   margin: 0 16px;
 }
 
-[data-test="sidebarContentMain"] form {
+.bbb-chat-form {
   margin: 0 !important;
   padding: 12px 16px 16px;
   border-top: 1px solid var(--theme-line);
   background: #fff;
 }
 
-[data-test="sidebarContentMain"] form > div > div {
+.bbb-chat-form__input {
   border: 1px solid #D5D8DD !important;
   border-radius: 8px !important;
   box-shadow: none !important;
 }
 
 /* Focus highlights the whole input box, not just the textarea inside it */
-[data-test="sidebarContentMain"] form > div > div:focus-within {
+.bbb-chat-form__input:focus-within {
   border-color: var(--theme-primary) !important;
   box-shadow: 0 0 0 3px rgba(15, 112, 215, .18) !important;
 }
@@ -258,8 +260,8 @@ body,
 }
 
 /* Thin, quiet scrollbars in the panels */
-[data-test="sidebarContentMain"],
-[data-test="sidebarContentMain"] * {
+.bbb-sidebar-content__panel,
+.bbb-sidebar-content__panel * {
   scrollbar-width: thin;
   scrollbar-color: #C5CBD3 transparent;
 }
@@ -271,12 +273,12 @@ body,
  * first layer, so the avatar's own ::after stays free for the presenter badge.
  */
 /* The photo (avatarURL) is an <img> with its own small radius */
-[data-test="moderatorAvatar"],
-[data-test="moderatorAvatar"] img {
+.bbb-avatar--moderator,
+.bbb-avatar--moderator img {
   border-radius: 50% !important;
 }
 
-[data-test="moderatorAvatar"] > div:first-child::after {
+.bbb-avatar--moderator > div:first-child::after {
   content: "";
   position: absolute;
   top: -5px;
@@ -292,14 +294,12 @@ body,
 
 /*
  * Presenter: a blue badge on the bottom right of the avatar in the user list.
- * The client does not mark the presenter's avatar, so the plugin sets
- * --theme-presenter-badge on that user's row (see main/component.tsx). The
- * avatar's own ::after is hidden and unused in the user list; its client
+ * The avatar's own ::after is hidden and unused in the user list; its client
  * styles (font glyph, zero size, border) are reset here.
  */
-:is([data-test="userListItem"], [data-test="userListItemCurrent"]) > :is([data-test="moderatorAvatar"], [data-test="viewerAvatar"])::after {
+.bbb-user-list-item > .bbb-avatar--presenter::after {
   content: "" !important;
-  display: var(--theme-presenter-badge, none) !important;
+  display: block !important;
   position: absolute !important;
   top: auto !important;
   left: auto !important;
@@ -318,7 +318,7 @@ body,
 }
 
 /* Users: search box with some room */
-[data-test="userListPanel"] > div:has(> input) {
+.bbb-user-list__search {
   margin: 16px !important;
   border-radius: 8px !important;
 }
@@ -326,71 +326,71 @@ body,
 /* ---------- Action bar (microphone, camera...) ---------- */
 
 /* 40px controls with 20px icons (the size Meet uses), 10px corners like the icon bar */
-#ActionsBar button > span[color]:first-child {
+.bbb-actions-bar .bbb-button--circle > .bbb-button__icon {
   width: 40px !important;
   height: 40px !important;
   border-radius: 10px !important;
 }
 
-#ActionsBar button > span[color]:first-child > i {
+.bbb-actions-bar .bbb-button__icon > i {
   font-size: 20px !important;
 }
 
 /* Presentation / media area: keep the single capsule, same height as the other buttons */
-#ActionsBar div:has(> [data-test="mediaAreaButton"]) {
+.bbb-actions-bar__media-buttons {
   height: 40px !important;
   align-items: center;
   overflow: hidden;
   border-radius: 10px !important;
 }
 
-#ActionsBar div:has(> [data-test="mediaAreaButton"]) button > span[color]:first-child {
+.bbb-actions-bar .bbb-actions-bar__media-buttons .bbb-button--circle > .bbb-button__icon {
   width: 44px !important;
   border-radius: 0 !important;
   background: transparent !important;
 }
 
-#ActionsBar button > span[color="primary"],
-#ActionsBar div:has(> [data-test="mediaAreaButton"]) button > span[color="primary"]:first-child {
+.bbb-actions-bar .bbb-button--primary > .bbb-button__icon,
+.bbb-actions-bar .bbb-actions-bar__media-buttons .bbb-button--primary > .bbb-button__icon {
   background: var(--theme-primary) !important;
   color: #fff !important;
 }
 
-#ActionsBar button > span[color="primary"] i {
+.bbb-actions-bar .bbb-button--primary > .bbb-button__icon i {
   color: #fff !important;
 }
 
 /* Soft hover, like the icon bar */
-#ActionsBar button > span[color]:first-child,
-[data-test="navigationSidebarContainer"] div[role="button"] {
+.bbb-actions-bar .bbb-button__icon,
+.bbb-navigation__item {
   transition: background-color .12s ease, color .12s ease;
 }
 
 /* The client turns the icon white on hover (it darkens the background), which
    vanishes on this light hover. Keep the normal icon color. */
-#ActionsBar button:hover > span[color="default"]:first-child,
-#ActionsBar div:has(> [data-test="mediaAreaButton"]) button:hover > span[color="default"]:first-child {
+.bbb-actions-bar .bbb-button--default:hover > .bbb-button__icon,
+.bbb-actions-bar .bbb-actions-bar__media-buttons .bbb-button--default:hover > .bbb-button__icon {
   background: #E6EBF2 !important;
   color: var(--btn-default-color, #4E5A66) !important;
 }
 
 /* Muted microphone and camera off in red, so "I am muted" reads at a glance */
-:is([data-test="unmuteMicButton"], [data-test="joinVideo"]) > span[color="default"] i {
+:is(.bbb-mute-toggle--muted, .bbb-video-toggle--off) > .bbb-button__icon i {
   color: var(--theme-danger) !important;
 }
 
 /* ---------- Presentation ---------- */
 
-[data-test="presentationContainer"] > div:nth-child(2),
+.bbb-presentation__content,
 #whiteboard-element > div:first-child {
   border-radius: 10px !important;
 }
 
 /* ---------- Cameras ---------- */
 
-/* Fill the tile like Meet does, instead of black bars above and below the video.
-   The tile is "webcamItemTalkingUser" while the person speaks. */
-:is([data-test="webcamItem"], [data-test="webcamItemTalkingUser"]) video {
+/* Fill the tile like Meet does, instead of black bars above and below the video,
+   also while the person speaks */
+.bbb-webcam video {
   object-fit: cover !important;
 }
 
@@ -400,13 +400,13 @@ body,
 }
 
 /* Presenter badge on the top left of the presenter's camera */
-div:has(> [data-test="presenterVideoButton"]) {
+div:has(> .bbb-webcam__presenter-badge) {
   border-radius: 6px !important;
   background: rgba(0, 0, 0, .6) !important;
 }
 
-/* Name tag readable over any video */
-[data-test="dropdownWebcamButton"] {
+/* Name tag readable over any video, with or without the user menu */
+.bbb-webcam__name {
   border-radius: 6px !important;
   background: rgba(0, 0, 0, .6) !important;
   font-size: 12px !important;
@@ -417,7 +417,7 @@ div:has(> [data-test="presenterVideoButton"]) {
 
 /* Options (top right): a tile like the connection and leave buttons beside it,
    instead of a bare icon on the dark background */
-[data-test="optionsButton"] > span[color]:first-child {
+.bbb-options-button > .bbb-button__icon {
   width: 31px !important;
   height: 31px !important;
   background: rgba(255, 255, 255, .12) !important;
@@ -425,11 +425,11 @@ div:has(> [data-test="presenterVideoButton"]) {
   transition: background-color .12s ease;
 }
 
-[data-test="optionsButton"]:hover > span[color]:first-child {
+.bbb-options-button:hover > .bbb-button__icon {
   background: rgba(255, 255, 255, .22) !important;
 }
 
-[data-test="optionsButton"] > span[color]:first-child > i {
+.bbb-options-button > .bbb-button__icon > i {
   font-size: 16px !important;
 }
 
@@ -440,14 +440,14 @@ div:has(> [data-test="presenterVideoButton"]) {
  * the microphone stays round, and toggle switches are not buttons.
  */
 button:not([data-test="audioDropdownMenu"]),
-button > span[color]:first-child,
+.bbb-button__icon,
 select,
 textarea,
 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
 [data-test="timeIndicator"],
 [data-test="remove-reaction"],
 div:has(> [data-test="increaseRooms"]),
-:is([data-test="userListItem"], [data-test="userListItemCurrent"]) > div:has(> div[data-test]) {
+.bbb-user-list-item > div:has(> div[data-test]) {
   border-radius: 8px !important;
 }
 
@@ -487,7 +487,7 @@ div:has(> [data-test="increaseRooms"]),
  * bar, the user list, the options button and the dropdown menus (the :is() at
  * the start of each rule); icons elsewhere keep the client defaults.
  */
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) :is(
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) :is(
   .icon-bbb-mute,
   .icon-bbb-unmute,
   .icon-bbb-listen,
@@ -544,220 +544,220 @@ div:has(> [data-test="increaseRooms"]),
 }
 
 /* Action bar */
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-mute::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-mute::before {
   -webkit-mask-image: url(./icons/mic-off.svg);
   mask-image: url(./icons/mic-off.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-unmute::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-unmute::before {
   -webkit-mask-image: url(./icons/mic.svg);
   mask-image: url(./icons/mic.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-listen::before,
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-audio_on::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-listen::before,
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-audio_on::before {
   -webkit-mask-image: url(./icons/headphones.svg);
   mask-image: url(./icons/headphones.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-audio_off::before,
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-no_audio::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-audio_off::before,
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-no_audio::before {
   -webkit-mask-image: url(./icons/headphone-off.svg);
   mask-image: url(./icons/headphone-off.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-video::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-video::before {
   -webkit-mask-image: url(./icons/video.svg);
   mask-image: url(./icons/video.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-video_off::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-video_off::before {
   -webkit-mask-image: url(./icons/video-off.svg);
   mask-image: url(./icons/video-off.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-desktop::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-desktop::before {
   -webkit-mask-image: url(./icons/screen-share.svg);
   mask-image: url(./icons/screen-share.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-desktop_off::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-desktop_off::before {
   -webkit-mask-image: url(./icons/screen-share-off.svg);
   mask-image: url(./icons/screen-share-off.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-reactions::before,
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-happy::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-reactions::before,
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-happy::before {
   -webkit-mask-image: url(./icons/smile-plus.svg);
   mask-image: url(./icons/smile-plus.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-hand::before,
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-hand_off::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-hand::before,
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-hand_off::before {
   -webkit-mask-image: url(./icons/hand.svg);
   mask-image: url(./icons/hand.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-presentation::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-presentation::before {
   -webkit-mask-image: url(./icons/presentation.svg);
   mask-image: url(./icons/presentation.svg);
 }
 
 /* Minimized presentation (the "restore" button): crossed, like mic and camera off */
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-presentation_off::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-presentation_off::before {
   -webkit-mask-image: url(./icons/presentation-off.svg);
   mask-image: url(./icons/presentation-off.svg);
 }
 
 
 /* Icon bar */
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-profile::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-profile::before {
   -webkit-mask-image: url(./icons/user-round-cog.svg);
   mask-image: url(./icons/user-round-cog.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-user_list::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-user_list::before {
   -webkit-mask-image: url(./icons/users.svg);
   mask-image: url(./icons/users.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-group_chat::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-group_chat::before {
   -webkit-mask-image: url(./icons/messages-square.svg);
   mask-image: url(./icons/messages-square.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-shared_notes::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-shared_notes::before {
   -webkit-mask-image: url(./icons/notebook-pen.svg);
   mask-image: url(./icons/notebook-pen.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-widgets::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-widgets::before {
   -webkit-mask-image: url(./icons/layout-grid.svg);
   mask-image: url(./icons/layout-grid.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-rooms::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-rooms::before {
   -webkit-mask-image: url(./icons/door-open.svg);
   mask-image: url(./icons/door-open.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-polling::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-polling::before {
   -webkit-mask-image: url(./icons/chart-column.svg);
   mask-image: url(./icons/chart-column.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-time::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-time::before {
   -webkit-mask-image: url(./icons/timer.svg);
   mask-image: url(./icons/timer.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-learning_dashboard::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-learning_dashboard::before {
   -webkit-mask-image: url(./icons/chart-no-axes-combined.svg);
   mask-image: url(./icons/chart-no-axes-combined.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-settings::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-settings::before {
   -webkit-mask-image: url(./icons/settings.svg);
   mask-image: url(./icons/settings.svg);
 }
 
 /* User list and its menu */
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-pen_tool::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-pen_tool::before {
   -webkit-mask-image: url(./icons/pencil.svg);
   mask-image: url(./icons/pencil.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-pen_tool_off::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-pen_tool_off::before {
   -webkit-mask-image: url(./icons/pencil-off.svg);
   mask-image: url(./icons/pencil-off.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-more::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-more::before {
   -webkit-mask-image: url(./icons/ellipsis-vertical.svg);
   mask-image: url(./icons/ellipsis-vertical.svg);
 }
 
 /* Make moderator: the same crown the moderator avatars get */
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-promote::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-promote::before {
   -webkit-mask-image: url(./icons/crown.svg);
   mask-image: url(./icons/crown.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-user::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-user::before {
   -webkit-mask-image: url(./icons/user-round.svg);
   mask-image: url(./icons/user-round.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-lock::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-lock::before {
   -webkit-mask-image: url(./icons/lock.svg);
   mask-image: url(./icons/lock.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-unlock::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-unlock::before {
   -webkit-mask-image: url(./icons/lock-open.svg);
   mask-image: url(./icons/lock-open.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) [data-test="removeUser"] .icon-bbb-circle_close::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) [data-test="removeUser"] .icon-bbb-circle_close::before {
   -webkit-mask-image: url(./icons/user-round-x.svg);
   mask-image: url(./icons/user-round-x.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-template_download::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-template_download::before {
   -webkit-mask-image: url(./icons/download.svg);
   mask-image: url(./icons/download.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-search::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-search::before {
   -webkit-mask-image: url(./icons/search.svg);
   mask-image: url(./icons/search.svg);
 }
 
 /* Other menus */
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-check::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-check::before {
   -webkit-mask-image: url(./icons/check.svg);
   mask-image: url(./icons/check.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-fullscreen::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-fullscreen::before {
   -webkit-mask-image: url(./icons/maximize.svg);
   mask-image: url(./icons/maximize.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-logout::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-logout::before {
   -webkit-mask-image: url(./icons/log-out.svg);
   mask-image: url(./icons/log-out.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) .icon-bbb-delete::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-delete::before {
   -webkit-mask-image: url(./icons/trash-2.svg);
   mask-image: url(./icons/trash-2.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) [data-test="endMeetingButton"] .icon-bbb-close::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) [data-test="endMeetingButton"] .icon-bbb-close::before {
   -webkit-mask-image: url(./icons/power.svg);
   mask-image: url(./icons/power.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) [data-test="toolVisibility"] .icon-bbb-close::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) [data-test="toolVisibility"] .icon-bbb-close::before {
   -webkit-mask-image: url(./icons/eye-off.svg);
   mask-image: url(./icons/eye-off.svg);
 }
 
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) [data-test="remove-reaction"] .icon-bbb-close::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) [data-test="remove-reaction"] .icon-bbb-close::before {
   -webkit-mask-image: url(./icons/x.svg);
   mask-image: url(./icons/x.svg);
 }
 
 /* "Capture current slide" is a photo, not a video */
-:is(#ActionsBar, [data-test="navigationSidebarContainer"], [data-test="userListPanel"], [data-test="optionsButton"], [role="menu"]) [data-test="presentationSnapshot"] .icon-bbb-video::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) [data-test="presentationSnapshot"] .icon-bbb-video::before {
   -webkit-mask-image: url(./icons/camera.svg);
   mask-image: url(./icons/camera.svg);
 }
 
-/* Top right options: a menu icon instead of the three dots. #app outweighs the
-   #ActionsBar in the rules above. */
-#app [data-test="optionsButton"] .icon-bbb-more::before {
+/* Top right options: a menu icon instead of the three dots. Same specificity as
+   the rules above, so being last is what makes it win. */
+.bbb-options-button .icon-bbb-more::before {
   -webkit-mask-image: url(./icons/menu.svg);
   mask-image: url(./icons/menu.svg);
 }
