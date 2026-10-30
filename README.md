@@ -2,7 +2,7 @@
 
 A theme plugin for the BigBlueButton 4.0 HTML5 client. It is pure CSS shipped as a plugin: no client rebuild, no `customStyleUrl`, no extra files to host besides the plugin itself.
 
-> **Branch `bbb-static-classes`:** this branch styles the client through static `bbb-*` classes (`bbb-avatar--presenter`, `bbb-navigation__item--active`...) instead of `data-test` attributes and DOM structure, and drops the JS that marked the presenter. Those classes are not in the stock BigBlueButton client yet, so this branch only works on a client built with them. Use `main` on a stock client.
+> **Requires BigBlueButton 4.0.1 or later.** The theme styles the client through its static `bbb-*` classes (`bbb-avatar--presenter`, `bbb-navigation__item--active`...), added in 4.0.1 ([#26193](https://github.com/bigbluebutton/bigbluebutton/pull/26193)). For 4.0.0, use the [`bbb-4.0.0`](https://github.com/gustavotrott/bbb-plugin-flat-theme/tree/bbb-4.0.0) branch, which styles it through `data-test` attributes and the DOM structure.
 
 ![Flat theme on BigBlueButton 4.0](docs/after.jpg)
 
@@ -117,16 +117,16 @@ Change them and rebuild.
 
 ## How it works
 
-The plugin imports `src/theme.css` through `style-loader`, which injects it into `<head>` when the bundle loads. SVG icons are inlined as data URIs, so the plugin is a single JS file. The React component registers the plugin and does one thing CSS cannot: the client does not mark the presenter's avatar, so the component reads the user list from the SDK (`useUsersBasicInfo`) and sets `--theme-presenter-badge` on the presenter's user list row, by its `data-id`. The badge itself is drawn in `theme.css`.
+The plugin imports `src/theme.css` through `style-loader`, which injects it into `<head>` when the bundle loads. SVG icons are inlined as data URIs, so the plugin is a single JS file. The React component only registers the plugin: the client marks the presenter's avatar with `bbb-avatar--presenter`, and the badge is drawn in `theme.css`.
 
 Some details worth knowing if you change the CSS:
 
 - The client positions the icon bar, sidebar panel, presentation and action bar in JS, with inline `left`/`top`/`width`/`height`. The theme only changes padding, color, border, radius and inner sizes. To make the icon bar narrower, the sidebar panel moves left by the difference and grows by the same amount, so it still meets the presentation.
 - The narrower icon bar only applies on screens with a mouse (`pointer: fine`, at least 768px wide). On phones the client uses a different width (48px), so the bar is left alone there.
-- Selectors use `data-test` attributes and ids, because styled-components class names change on every client build.
+- Selectors use the client's static `bbb-*` classes (`block`, `block__element`, `block--state`), because styled-components class names change on every client build. A few elements without one still go by their `data-test` attribute.
 - Icons replace the `::before` glyph of the `icon-bbb-*` classes with an SVG used as a mask, so they still follow the text color.
 
-Tested on BigBlueButton 4.0.0 with plugin SDK `1.0.0-beta`.
+Tested on BigBlueButton 4.0.2 (`v4.0.x-develop` of 30/10/2026) with plugin SDK `1.0.0-beta`.
 
 The theme targets the client's light mode. On the test server, turning on the client's own dark mode (Settings, Application) left the whole screen blank even with this plugin removed, so dark mode was not styled.
 
