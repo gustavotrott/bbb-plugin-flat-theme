@@ -580,7 +580,10 @@ div:has(> .bbb-webcam__name) {
   font-weight: 600 !important;
 }
 
-.bbb-chat-message__time {
+/* The header time, and the one the client shows on hover in the bubble's
+   corner (system notices and follow-up messages from the same person) */
+.bbb-chat-message__time,
+[data-test="chatMessageFooterTime"] {
   font-size: .75rem !important;
   font-style: normal !important;
   color: #8A939E !important;
