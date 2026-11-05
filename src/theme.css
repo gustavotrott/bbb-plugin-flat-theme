@@ -19,6 +19,7 @@
   --theme-moderator: #F5B700;
   --theme-line: #E3E4E8;
   --theme-text: #1f2329;
+  --theme-talking: #22C55E;
   /* Icon bar width. The client computes 60px + 2% of the window in JS */
   --theme-nav-width: 72px;
   --theme-nav-excess: calc(60px + 2vw - var(--theme-nav-width));
@@ -239,8 +240,21 @@ body,
   outline: none !important;
 }
 
+/*
+ * The client sets line-height: 1 (a caret as short as the letters) and gives
+ * the placeholder the same color as the caret, so on an empty box the caret
+ * melts into the first letter. Taller line, blue caret, lighter placeholder.
+ */
 #message-input {
   font-size: 1rem !important;
+  line-height: 1.4 !important;
+  caret-color: var(--theme-primary);
+  color: var(--theme-text) !important;
+}
+
+#message-input::placeholder {
+  color: #8A939E !important;
+  opacity: 1;
 }
 
 /* Send: icon only, no filled square */
@@ -269,8 +283,12 @@ body,
 /*
  * Avatars: the client tells moderators apart by a square avatar. Here every
  * avatar is round and moderators get a small gold crown on the top right
- * corner instead, clear of the initials. The badge sits on the avatar's empty
- * first layer, so the avatar's own ::after stays free for the presenter badge.
+ * corner instead, clear of the initials.
+ *
+ * The crown is the avatar's own ::before, a hidden status dot in the client
+ * (its font glyph, zero size and border are reset here). It must not sit on
+ * the first child: that is the "talking" layer the client pulses with scale
+ * and opacity, and the crown pulsed with it. ::after is the presenter badge.
  */
 /* The photo (avatarURL) is an <img> with its own small radius */
 .bbb-avatar--moderator,
@@ -278,18 +296,30 @@ body,
   border-radius: 50% !important;
 }
 
-.bbb-avatar--moderator > div:first-child::after {
-  content: "";
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  z-index: 2;
-  width: 13px;
-  height: 13px;
-  border-radius: 50%;
-  background: var(--theme-moderator) url(./icons/crown-badge.svg) center / 8px no-repeat;
-  box-shadow: 0 0 0 1.5px #fff;
+.bbb-avatar.bbb-avatar--moderator::before {
+  content: "" !important;
+  display: block !important;
+  position: absolute !important;
+  top: -5px !important;
+  right: -5px !important;
+  bottom: auto !important;
+  left: auto !important;
+  z-index: 2 !important;
+  width: 13px !important;
+  height: 13px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  opacity: 1 !important;
+  letter-spacing: 0 !important;
+  background: var(--theme-moderator) url(./icons/crown-badge.svg) center / 8px no-repeat !important;
+  box-shadow: 0 0 0 1.5px #fff !important;
   pointer-events: none;
+}
+
+[dir="rtl"] .bbb-avatar.bbb-avatar--moderator::before {
+  right: auto !important;
+  left: -5px !important;
 }
 
 /*
@@ -456,6 +486,258 @@ div:has(> [data-test="increaseRooms"]),
 .Toastify__toast {
   border-radius: 8px !important;
   box-shadow: 0 4px 16px rgba(16, 33, 51, .16) !important;
+}
+
+/* [polish:toast] Colored accent on the left by type (like Slack and Linear)
+   and a thin, quiet progress bar instead of the thick gray one */
+.Toastify__toast {
+  border-left: 4px solid var(--theme-primary) !important;
+}
+
+.Toastify__toast--success {
+  border-left-color: var(--theme-talking) !important;
+}
+
+.Toastify__toast--warning {
+  border-left-color: var(--theme-moderator) !important;
+}
+
+.Toastify__toast--error {
+  border-left-color: var(--theme-danger) !important;
+}
+
+.Toastify__progress-bar {
+  height: 3px !important;
+  opacity: .35 !important;
+}
+
+/* ---------- Polish ---------- */
+
+/*
+ * [polish:talking] Speaking: a green ring around the avatar (Meet, Discord)
+ * instead of the client's pulse, a copy of the avatar that grows and fades.
+ * The client draws the pulse on the avatar's first child; it is turned off
+ * there and the ring goes on the avatar itself, keyed by its static class.
+ */
+.bbb-avatar > div:first-child {
+  animation: none !important;
+  background-color: transparent !important;
+}
+
+.bbb-avatar > div:first-child::before {
+  display: none !important;
+}
+
+.bbb-avatar--talking {
+  animation: theme-talking 1.1s ease-in-out infinite alternate;
+}
+
+@keyframes theme-talking {
+  from {
+    box-shadow: 0 0 0 2px var(--theme-talking), 0 0 0 2px rgba(34, 197, 94, .25);
+  }
+  to {
+    box-shadow: 0 0 0 2px var(--theme-talking), 0 0 0 6px rgba(34, 197, 94, .25);
+  }
+}
+
+/* Reduced motion: the ring stays, without the breathing */
+@media (prefers-reduced-motion: reduce) {
+  .bbb-avatar--talking {
+    animation: none !important;
+    box-shadow: 0 0 0 2px var(--theme-talking), 0 0 0 5px rgba(34, 197, 94, .25);
+  }
+}
+
+/* [polish:webcam] Tiles: a hairline instead of the thick gray frame, and a
+   green frame with a soft glow on whoever speaks (Meet, Zoom) */
+.bbb-webcam::after {
+  border: 1px solid rgba(255, 255, 255, .10) !important;
+  transition: border-color .15s ease, box-shadow .15s ease !important;
+}
+
+.bbb-webcam--talking::after {
+  border: 3px solid var(--theme-talking) !important;
+  box-shadow: 0 0 16px rgba(34, 197, 94, .35) !important;
+}
+
+/* Name tag: the client draws a second, wider dark box behind it */
+div:has(> .bbb-webcam__name) {
+  background: transparent !important;
+}
+
+/* [polish:chat] Messages: room between people, quieter time, pill-shaped
+   system notices ("X is now the presenter") */
+.bbb-chat-message:has(.bbb-chat-message__name):not(:first-child) {
+  margin-top: 20px !important;
+}
+
+.bbb-chat-message .chat-message-content {
+  border-radius: 12px !important;
+}
+
+.bbb-chat-message__name {
+  font-weight: 600 !important;
+}
+
+.bbb-chat-message__time {
+  font-size: .75rem !important;
+  font-style: normal !important;
+  color: #8A939E !important;
+}
+
+.bbb-chat-message--system [data-test="chatMessageNotificationContent"] {
+  display: flex;
+  justify-content: center;
+}
+
+.bbb-chat-message--system [data-test="chatMessageNotificationContent"] p {
+  display: inline-block !important;
+  margin: 0 !important;
+  padding: 4px 12px !important;
+  border-radius: 999px;
+  background: #F1F3F6;
+  color: #5B6672 !important;
+  font-size: .8rem !important;
+  line-height: 1.4 !important;
+}
+
+/* Softer scroll shadow at the top and bottom of the message list */
+#chat-list {
+  background:
+    linear-gradient(#fff 30%, rgba(255, 255, 255, 0)),
+    linear-gradient(rgba(255, 255, 255, 0), #fff 70%) 0 100%,
+    radial-gradient(farthest-side at 50% 0, rgba(16, 33, 51, .08), transparent),
+    radial-gradient(farthest-side at 50% 100%, rgba(16, 33, 51, .08), transparent) 0 100% !important;
+  background-repeat: no-repeat !important;
+  background-size: 100% 40px, 100% 40px, 100% 10px, 100% 10px !important;
+  background-attachment: local, local, scroll, scroll !important;
+}
+
+/* [polish:users] User list: soft hover on each person, and the actions
+   capsule only gets its gray box on hover, so the list reads calmer */
+.bbb-user-list-item {
+  border-radius: 10px !important;
+  transition: background-color .12s ease;
+}
+
+.bbb-user-list-item:hover {
+  background-color: #F4F6FA !important;
+}
+
+.bbb-user-list-item > div:has(> div[data-test]) {
+  background: transparent !important;
+  transition: background-color .12s ease;
+}
+
+.bbb-user-list-item:hover > div:has(> div[data-test]) {
+  background: #E9EDF3 !important;
+}
+
+/* Search field: blue focus like the chat box, not the client's thick gray ring */
+.bbb-user-list__search:focus-within,
+.bbb-user-list__search input:focus {
+  outline: none !important;
+}
+
+.bbb-user-list__search:has(input:focus) {
+  border-color: var(--theme-primary) !important;
+  box-shadow: 0 0 0 3px rgba(15, 112, 215, .18) !important;
+}
+
+/* [polish:footer] "Mute all" and "Lock viewers": one button each, icon and
+   text together, instead of a caption over a big gray box. The real button
+   stretches over the whole box (::after), so the whole box is clickable. */
+.bbb-user-list > div:last-child:has(> div > [data-test="muteAllUsers"], > div > [data-test="lockViewersButton"]) {
+  gap: 8px;
+}
+
+.bbb-user-list > div:last-child > div:has(> [data-test="muteAllUsers"], > [data-test="lockViewersButton"]) {
+  position: relative;
+  display: flex !important;
+  flex-direction: row-reverse !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px !important;
+  box-sizing: border-box;
+  border: 1px solid #DCE1E8;
+  border-radius: 10px;
+  background: #fff;
+  transition: background-color .12s ease, border-color .12s ease;
+}
+
+.bbb-user-list > div:last-child > div:has(> [data-test="muteAllUsers"], > [data-test="lockViewersButton"]):hover {
+  border-color: #C5CDD8;
+  background: #F4F6FA;
+}
+
+.bbb-user-list > div:last-child > div > span {
+  margin: 0 !important;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: .85rem !important;
+  font-weight: 500 !important;
+  color: var(--theme-text) !important;
+}
+
+.bbb-user-list > div:last-child > div > :is([data-test="muteAllUsers"], [data-test="lockViewersButton"]) {
+  position: static !important;
+  flex: 0 0 auto;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.bbb-user-list > div:last-child > div > :is([data-test="muteAllUsers"], [data-test="lockViewersButton"])::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+}
+
+/* [polish:badge] Unread chat dot: ringed in the bar color so it stands off
+   the icon, like the badges on phone apps */
+.bbb-navigation__item--notification::after {
+  width: 10px !important;
+  height: 10px !important;
+  box-sizing: content-box !important;
+  border: 2px solid var(--theme-nav) !important;
+  background-color: var(--theme-danger) !important;
+}
+
+/* [polish:panel] Panel titles a touch bolder, like app section headers */
+.bbb-panel-header__title {
+  font-weight: 600 !important;
+  letter-spacing: -.01em;
+}
+
+/*
+ * [polish:mobile] Touch screens: 44px targets in the action bar (Apple's
+ * minimum), and a 16px chat box, since iOS zooms the page into any field
+ * with a smaller font.
+ */
+@media (pointer: coarse) {
+  .bbb-actions-bar .bbb-button--circle > .bbb-button__icon {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .bbb-actions-bar__media-buttons {
+    height: 44px !important;
+  }
+
+  #message-input {
+    font-size: 16px !important;
+  }
 }
 
 /* ---------- Accessibility ---------- */
