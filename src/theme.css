@@ -23,6 +23,14 @@
   /* Icon bar width. The client computes 60px + 2% of the window in JS */
   --theme-nav-width: 72px;
   --theme-nav-excess: calc(60px + 2vw - var(--theme-nav-width));
+  /* Default corner radius (icon bar, action bar, presentation, user list) */
+  --theme-radius: 10px;
+
+  /* bbb-plugin-reaction-stack: same corners as the rest of the theme instead of
+     its round pills. The emoji disc sits 0.25rem inside the pill, so a smaller
+     radius keeps the two curves parallel. */
+  --reaction-stack-radius: var(--theme-radius);
+  --reaction-stack-emoji-radius: 6px;
 }
 
 /* Background behind the presentation, top bar and action bar */

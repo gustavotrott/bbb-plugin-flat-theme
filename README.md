@@ -60,6 +60,7 @@ _Camera images in the screenshots are illustrations._
 - Every other button uses 8px corners instead of circles and capsules: top bar (start recording, connection status, leave, options), panels (mute all, polls, timer, breakout rooms, profile), slide navigation and zoom, undo/redo, menus and modals.
 - Text fields and selects get the same 8px corners. The small audio device arrow on the microphone stays round.
 - Panels get thin, quiet scrollbars.
+- If [bbb-plugin-reaction-stack](https://github.com/bigbluebutton/bbb-plugin-reaction-stack) is installed, its reaction pills get the theme's 10px corners instead of round capsules (through its `--reaction-stack-radius` variables).
 
 **Accessibility**
 - A visible focus ring for keyboard navigation (`:focus-visible`), the same everywhere.
