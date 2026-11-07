@@ -72,33 +72,56 @@ _Camera images in the screenshots are illustrations._
 - Icons keep showing the state, like the client does: a crossed microphone when muted, a crossed camera when it is off, a crossed screen when not sharing, a crossed presentation when it is minimized.
 - Icons elsewhere keep the client defaults.
 
-## Install
+## Try it without installing
 
-1. Build the bundle (or grab `dist/` from a release):
+The plugin is hosted on GitHub Pages. Pass its manifest when you create a meeting, and that meeting loads the theme with nothing installed on the server:
 
-   ```bash
-   npm install
-   npm run build-bundle
-   ```
+```text
+pluginManifests=[{"url":"https://gustavotrott.github.io/bbb-plugin-flat-theme/manifest.json"}]
+```
 
-2. Copy `dist/` to a folder served by nginx on the BigBlueButton server, for example:
+You can add it to the `create` call in [API Mate](https://mconf.github.io/api-mate/) or in your own integration. The BigBlueButton server reads the manifest when the meeting is created, so it must reach `github.io`. The participants' browsers load the plugin from there too.
+
+## Install on your server
+
+These steps install from the latest [release](https://github.com/gustavotrott/bbb-plugin-flat-theme/releases/latest).
+
+1. Download it into a folder served by nginx:
 
    ```bash
    sudo mkdir -p /var/www/bigbluebutton-default/assets/plugins/bbb-plugin-flat-theme
-   sudo cp dist/* /var/www/bigbluebutton-default/assets/plugins/bbb-plugin-flat-theme/
+   curl -fsSL https://github.com/gustavotrott/bbb-plugin-flat-theme/releases/latest/download/bbb-plugin-flat-theme.tar.gz \
+     | sudo tar xz --no-same-owner -C /var/www/bigbluebutton-default/assets/plugins/bbb-plugin-flat-theme
    ```
 
-3. Add the manifest to `pluginManifests` in `/etc/bigbluebutton/bbb-web.properties` (keep the other plugins you already have in the list):
+2. Add the manifest to `pluginManifests` in `/etc/bigbluebutton/bbb-web.properties`. Keep the other plugins you already have in the list:
 
    ```properties
    pluginManifests=[{"url":"https://<your-server>/plugins/bbb-plugin-flat-theme/manifest.json"}]
    ```
 
-4. Restart bbb-web: `sudo systemctl restart bbb-web`. Meetings created from then on load the theme.
+3. Restart bbb-web:
 
-To try it on a single meeting instead, pass the manifest on the `create` call: `pluginManifests=[{"url":"https://<your-server>/plugins/bbb-plugin-flat-theme/manifest.json"}]`.
+   ```bash
+   sudo systemctl restart bbb-web
+   ```
+
+Meetings created from then on load the theme. To update, run step 1 again. No restart is needed.
+
+You can skip the download and put the GitHub Pages manifest (`https://gustavotrott.github.io/bbb-plugin-flat-theme/manifest.json`) in `bbb-web.properties` instead. The theme then always follows the latest version on `main`.
 
 If you used a `customStyleUrl` before, remove it from `/etc/bigbluebutton/bbb-html5.yml` and restart `bbb-apps-akka` as well: the client settings are stored per meeting by akka-apps, which only reads that file on startup.
+
+## Build from source
+
+```bash
+npm ci
+npm run build-bundle
+sudo mkdir -p /var/www/bigbluebutton-default/assets/plugins/bbb-plugin-flat-theme
+sudo cp dist/* /var/www/bigbluebutton-default/assets/plugins/bbb-plugin-flat-theme/
+```
+
+Then follow steps 2 and 3 above.
 
 ## Customizing
 
@@ -130,6 +153,14 @@ Some details worth knowing if you change the CSS:
 Tested on BigBlueButton 4.0.2 (`v4.0.x-develop` of 30/10/2026) with plugin SDK `1.0.0-beta`.
 
 The theme targets the client's light mode. On the test server, turning on the client's own dark mode (Settings, Application) left the whole screen blank even with this plugin removed, so dark mode was not styled.
+
+## Releases
+
+Every push to `main` publishes `dist/` on GitHub Pages. Pushing a `v*` tag, with the same version as `package.json` and `manifest.json`, builds the plugin and attaches `bbb-plugin-flat-theme.tar.gz` to a GitHub release.
+
+## More themes
+
+[bbb-plugin-themes](https://github.com/gustavotrott/bbb-plugin-themes) has seven more themes built on this one: Cozy, Kids, Light, Midnight, Synthwave, Moodle and School (K-12).
 
 ## License
 
