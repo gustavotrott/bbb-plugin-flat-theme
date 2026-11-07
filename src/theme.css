@@ -485,7 +485,7 @@ input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
 [data-test="timeIndicator"],
 [data-test="remove-reaction"],
 div:has(> [data-test="increaseRooms"]),
-.bbb-user-list-item > div:has(> div[data-test]) {
+:is(.bbb-user-list-item, .bbb-raised-hands__item, [data-test="raisedHandsListItem"]) > div:has(> div[data-test]) {
   border-radius: 8px !important;
 }
 
@@ -627,21 +627,23 @@ div:has(> .bbb-webcam__name) {
 
 /* [polish:users] User list: soft hover on each person, and the actions
    capsule only gets its gray box on hover, so the list reads calmer */
-.bbb-user-list-item {
+/* The raised hands rows at the top reuse the user list item: same look.
+   .bbb-raised-hands__item comes from bigbluebutton/bigbluebutton#26415; data-test covers earlier versions */
+:is(.bbb-user-list-item, .bbb-raised-hands__item, [data-test="raisedHandsListItem"]) {
   border-radius: 10px !important;
   transition: background-color .12s ease;
 }
 
-.bbb-user-list-item:hover {
+:is(.bbb-user-list-item, .bbb-raised-hands__item, [data-test="raisedHandsListItem"]):hover {
   background-color: #F4F6FA !important;
 }
 
-.bbb-user-list-item > div:has(> div[data-test]) {
+:is(.bbb-user-list-item, .bbb-raised-hands__item, [data-test="raisedHandsListItem"]) > div:has(> div[data-test]) {
   background: transparent !important;
   transition: background-color .12s ease;
 }
 
-.bbb-user-list-item:hover > div:has(> div[data-test]) {
+:is(.bbb-user-list-item, .bbb-raised-hands__item, [data-test="raisedHandsListItem"]):hover > div:has(> div[data-test]) {
   background: #E9EDF3 !important;
 }
 
