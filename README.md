@@ -5,7 +5,7 @@ A theme plugin for the BigBlueButton 4.0 HTML5 client. It is pure CSS, so you ca
 - **As a plugin** (`pluginManifests`): no client rebuild and nothing else to configure.
 - **As a plain stylesheet** (`customStyleUrl`): one static `theme.css` with every icon inlined, if you would rather not run a plugin. See [Use it as a custom style](#use-it-as-a-custom-style-css-only).
 
-> **Requires BigBlueButton 4.0.1 or later.** The theme styles the client through its static `bbb-*` classes (`bbb-avatar--presenter`, `bbb-navigation__item--active`...), added in 4.0.1 ([#26193](https://github.com/bigbluebutton/bigbluebutton/pull/26193)). For 4.0.0, use the [`bbb-4.0.0`](https://github.com/gustavotrott/bbb-plugin-flat-theme/tree/bbb-4.0.0) branch, which styles it through `data-test` attributes and the DOM structure.
+> **Requires BigBlueButton 4.0.1 or later.** The theme styles the client through its static `bbb-*` classes (`bbb-avatar--presenter`, `bbb-navigation__item--active`...), added in 4.0.1 ([#26193](https://github.com/bigbluebutton/bigbluebutton/pull/26193)). For 4.0.0, use the [4.0.0 stylesheet](#use-it-as-a-custom-style-css-only), or the plugin from the [`bbb-4.0.0`](https://github.com/gustavotrott/bbb-plugin-flat-theme/tree/bbb-4.0.0) branch.
 
 ![Flat theme on BigBlueButton 4.0](docs/after.jpg)
 
@@ -119,7 +119,17 @@ If you used a `customStyleUrl` before, remove it from `/etc/bigbluebutton/bbb-ht
 
 The build also writes `dist/theme.css`: the same theme as one static stylesheet, with the icons inlined as data URIs. The client adds it as a `<link rel="stylesheet">`, so nothing runs besides the CSS. Use the plugin or the stylesheet, not both.
 
-The stylesheet is on GitHub Pages at `https://gustavotrott.github.io/bbb-plugin-flat-theme/theme.css`, and every release attaches it as `theme.css`.
+Pick the stylesheet for your BigBlueButton version:
+
+| BigBlueButton | Stylesheet |
+|---|---|
+| 4.0.3 or later (with [#26415](https://github.com/bigbluebutton/bigbluebutton/pull/26415)) | `https://gustavotrott.github.io/bbb-plugin-flat-theme/4.0.3/theme.css` |
+| 4.0.1 and 4.0.2 | `https://gustavotrott.github.io/bbb-plugin-flat-theme/4.0.1/theme.css` |
+| 4.0.0 | `https://gustavotrott.github.io/bbb-plugin-flat-theme/4.0.0/theme.css` |
+
+`https://gustavotrott.github.io/bbb-plugin-flat-theme/theme.css` always follows the newest version on `main`, and every release attaches it as `theme.css`.
+
+The 4.0.0 and 4.0.1 stylesheets are frozen in [`versions/`](versions): new changes only go to the newest version. The 4.0.0 one reaches the client through the `data-test` attributes and ids that 4.0.0 already had, so a few details need a newer client: the presenter badge in the user list, the color of your own chat messages, the ring on the avatar of whoever speaks and the unread dot on the icon bar.
 
 **For one user**, pass it on the `join` call:
 
@@ -134,7 +144,7 @@ userdata-bbb_custom_style_url=https://gustavotrott.github.io/bbb-plugin-flat-the
    ```bash
    sudo mkdir -p /var/www/bigbluebutton-default/assets/plugins/bbb-plugin-flat-theme
    sudo curl -fsSL -o /var/www/bigbluebutton-default/assets/plugins/bbb-plugin-flat-theme/theme.css \
-     https://github.com/gustavotrott/bbb-plugin-flat-theme/releases/latest/download/theme.css
+     https://gustavotrott.github.io/bbb-plugin-flat-theme/4.0.1/theme.css   # the URL for your version
    ```
 
 2. Set `public.app.customStyleUrl` in `/etc/bigbluebutton/bbb-html5.yml`:
@@ -158,7 +168,7 @@ sudo mkdir -p /var/www/bigbluebutton-default/assets/plugins/bbb-plugin-flat-them
 sudo cp dist/* /var/www/bigbluebutton-default/assets/plugins/bbb-plugin-flat-theme/
 ```
 
-Then follow steps 2 and 3 of [Install on your server](#install-on-your-server). `npm run build-bundle` also writes `dist/theme.css`; `npm run build-css` writes only that file.
+Then follow steps 2 and 3 of [Install on your server](#install-on-your-server). `npm run build-bundle` also writes `dist/theme.css` and copies the frozen stylesheets from `versions/`; `npm run build-css` does only that.
 
 ## Customizing
 
