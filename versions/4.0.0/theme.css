@@ -1,0 +1,1060 @@
+/* bbb-plugin-flat-theme 0.4.1 for BigBlueButton 4.0.0. MIT license. */
+
+/*
+ * Flat theme for the BigBlueButton 4.0 HTML5 client.
+ *
+ * The client positions the main blocks (icon bar, sidebar panel, presentation,
+ * action bar) in JS with inline left/top/width/height, so this file only
+ * touches padding, color, border, radius and inner sizes.
+ *
+ * This branch targets a client with the static `bbb-*` classes (block,
+ * block__element, block--state). The main branch keeps the data-test and
+ * structural selectors that work on the stock client.
+ */
+
+:root {
+  --theme-background: #102133;
+  --theme-nav: #133459;
+  --theme-nav-active: #1E4877;
+  --theme-primary: #0F70D7;
+  --theme-danger: #D93025;
+  --theme-moderator: #F5B700;
+  --theme-line: #E3E4E8;
+  --theme-text: #1f2329;
+  --theme-talking: #22C55E;
+  /* Icon bar width. The client computes 60px + 2% of the window in JS */
+  --theme-nav-width: 72px;
+  --theme-nav-excess: calc(60px + 2vw - var(--theme-nav-width));
+  /* Default corner radius (icon bar, action bar, presentation, user list) */
+  --theme-radius: 10px;
+
+  /* bbb-plugin-reaction-stack: same corners as the rest of the theme instead of
+     its round pills. The emoji disc sits 0.25rem inside the pill, so a smaller
+     radius keeps the two curves parallel. */
+  --reaction-stack-radius: var(--theme-radius);
+  --reaction-stack-emoji-radius: 6px;
+}
+
+/* Background behind the presentation, top bar and action bar */
+body,
+#layout > div:not([data-test]),
+:where(#Navbar):nth-child(n),
+:where(#ActionsBar):nth-child(n) {
+  background-color: var(--theme-background) !important;
+}
+
+#layout {
+  padding-top: 0 !important;
+}
+
+/* ---------- Icon bar (navigation sidebar) ---------- */
+
+:where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n) {
+  padding: 0 !important;
+  background: var(--theme-nav) !important;
+}
+
+/* No padding here: on phones the closed bar has zero height and padding would leave a strip */
+:where([data-test="navigationSidebarContainer"]):nth-child(n) {
+  height: 100% !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  background: var(--theme-nav) !important;
+}
+
+:where([data-test="navigationSidebarContainer"] > div):nth-child(n) {
+  border-radius: 0 !important;
+}
+
+:where([data-test="brandingArea"]):nth-child(n) {
+  display: flex;
+  justify-content: center;
+  padding: 16px 0 !important;
+}
+
+/* Logo on a white tile, so any logo reads well on the dark bar */
+:where([data-test="brandingArea"]):nth-child(n) img {
+  width: 56px;
+  max-height: 56px;
+  padding: 6px;
+  box-sizing: border-box;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 8px;
+}
+
+:where([data-test="navigationSidebarContainer"] hr):nth-child(n) {
+  border-color: rgba(255, 255, 255, .15) !important;
+  background: rgba(255, 255, 255, .15) !important;
+}
+
+/*
+ * The bar is a size container, so buttons and the active marker follow its
+ * real width: 72px on desktop, 48px on phones (where the client overlays it).
+ */
+:where([data-test="navigationSidebarContainer"]):nth-child(n) {
+  container-type: inline-size;
+  --theme-nav-button: min(48px, calc(100cqw - 8px));
+}
+
+/*
+ * The scrolling list uses the client's "scroll shadow" (white gradients with
+ * background-attachment: local), made for its white bar. Redrawn in the bar
+ * color, otherwise white bands show at the top and bottom when scrolling.
+ * No sideways scroll and no visible scrollbar: on phones they ate the width.
+ */
+:where([data-test="navigationSidebarContainer"] > div):nth-child(n) {
+  padding-bottom: 16px !important;
+  box-sizing: border-box;
+  overflow-x: hidden !important;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  background-image:
+    linear-gradient(var(--theme-nav) 30%, transparent),
+    linear-gradient(transparent, var(--theme-nav) 70%),
+    radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, .35), transparent),
+    radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, .35), transparent) !important;
+}
+
+:where([data-test="navigationSidebarContainer"] > div):nth-child(n)::-webkit-scrollbar {
+  display: none;
+}
+
+:where([data-test="navigationSidebarContainer"] [role="button"][aria-expanded]):nth-child(n) {
+  width: var(--theme-nav-button) !important;
+  height: var(--theme-nav-button) !important;
+  margin: 4px auto !important;
+  border-radius: 10px !important;
+  color: #fff !important;
+  background: transparent !important;
+}
+
+:where([data-test="navigationSidebarContainer"] [role="button"][aria-expanded]):nth-child(n) i {
+  color: #fff !important;
+  font-size: 22px !important;
+}
+
+:where([data-test="navigationSidebarContainer"] [role="button"][aria-expanded]):nth-child(n):hover {
+  background: rgba(255, 255, 255, .08) !important;
+}
+
+:where([data-test="navigationSidebarContainer"] [role="button"][aria-expanded="true"]):nth-child(n) {
+  background: var(--theme-nav-active) !important;
+}
+
+/* Marker on the right edge of the bar, beside the active item */
+:where([data-test="navigationSidebarContainer"] [role="button"][aria-expanded="true"]):nth-child(n)::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: calc((var(--theme-nav-button) - 100cqw) / 2);
+  width: 4px;
+  background: var(--theme-primary);
+}
+
+/*
+ * Narrower icon bar: the client places the sidebar panel right after the width
+ * it computed, so the panel moves left by the excess and grows by the same
+ * amount on the right. Only on mouse screens: phones use another width (48px).
+ */
+@media (pointer: fine) and (min-width: 768px) {
+  :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n) {
+    width: var(--theme-nav-width) !important;
+  }
+
+  :where(#layout > div:has(> [data-test="sidebarContentMain"])):nth-child(n) {
+    margin-left: calc(-1 * var(--theme-nav-excess));
+    box-sizing: content-box !important;
+    padding-right: var(--theme-nav-excess) !important;
+  }
+
+  :where(#layout > div:has(> [data-test="sidebarContentMain"])):nth-child(n) :where([data-test="sidebarContentMain"]):nth-child(n) {
+    width: calc(100% + var(--theme-nav-excess)) !important;
+  }
+}
+
+/* ---------- Sidebar panel (chat, users, notes...) ---------- */
+
+:where(#layout > div:has(> [data-test="sidebarContentMain"])):nth-child(n) {
+  padding: 0 !important;
+  background: #fff !important;
+}
+
+:where([data-test="sidebarContentMain"]):nth-child(n) {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+}
+
+:where([data-test="sidebarContentMain"]):nth-child(n),
+:where([data-test="sidebarContentMain"]):nth-child(n) > div {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+:where([data-test="sidebarContentMain"] header):nth-child(n) {
+  display: flex;
+  align-items: center;
+  min-height: 64px;
+  box-sizing: border-box;
+  padding: 0 12px 0 20px !important;
+  border-bottom: 1px solid var(--theme-line);
+}
+
+:where([data-test="sidebarContentMain"] header h2):nth-child(n) {
+  text-transform: none !important;
+  font-size: 1.2rem !important;
+  font-weight: 500 !important;
+  color: var(--theme-text) !important;
+}
+
+:where([data-test="sidebarContentMain"] header):nth-child(n) + hr {
+  display: none !important;
+}
+
+/* Chat (other panels, like polls, also use #scroll-box and keep their padding) */
+:where(#scroll-box:has(#chat-list)):nth-child(n) {
+  padding: 0 !important;
+}
+
+#chat-list {
+  padding: 16px 16px 8px !important;
+}
+
+[data-test="chatReplyIntentionContainer"] {
+  margin: 0 16px;
+}
+
+:where(form:has(#message-input)):nth-child(n) {
+  margin: 0 !important;
+  padding: 12px 16px 16px;
+  border-top: 1px solid var(--theme-line);
+  background: #fff;
+}
+
+:where(form:has(#message-input) > div > div):nth-child(n) {
+  border: 1px solid #D5D8DD !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+/* Focus highlights the whole input box, not just the textarea inside it */
+:where(form:has(#message-input) > div > div):nth-child(n):focus-within {
+  border-color: var(--theme-primary) !important;
+  box-shadow: 0 0 0 3px rgba(15, 112, 215, .18) !important;
+}
+
+#message-input:focus,
+#message-input:focus-visible {
+  outline: none !important;
+}
+
+/*
+ * The client sets line-height: 1 (a caret as short as the letters) and gives
+ * the placeholder the same color as the caret, so on an empty box the caret
+ * melts into the first letter. Taller line, blue caret, lighter placeholder.
+ */
+#message-input {
+  font-size: 1rem !important;
+  line-height: 1.4 !important;
+  caret-color: var(--theme-primary);
+  color: var(--theme-text) !important;
+}
+
+#message-input::placeholder {
+  color: #8A939E !important;
+  opacity: 1;
+}
+
+/* Send: icon only, no filled square */
+[data-test="sendMessageButton"] {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+[data-test="sendMessageButton"] svg,
+[data-test="sendMessageButton"] svg * {
+  fill: #6b7280 !important;
+}
+
+[data-test="sendMessageButton"]:hover svg,
+[data-test="sendMessageButton"]:hover svg * {
+  fill: var(--theme-primary) !important;
+}
+
+/* Thin, quiet scrollbars in the panels */
+:where([data-test="sidebarContentMain"]):nth-child(n),
+:where([data-test="sidebarContentMain"]):nth-child(n) * {
+  scrollbar-width: thin;
+  scrollbar-color: #C5CBD3 transparent;
+}
+
+/*
+ * Avatars: the client tells moderators apart by a square avatar. Here every
+ * avatar is round and moderators get a small gold crown on the top right
+ * corner instead, clear of the initials.
+ *
+ * The crown is the avatar's own ::before, a hidden status dot in the client
+ * (its font glyph, zero size and border are reset here). It must not sit on
+ * the first child: that is the "talking" layer the client pulses with scale
+ * and opacity, and the crown pulsed with it. ::after is the presenter badge.
+ */
+/* The photo (avatarURL) is an <img> with its own small radius */
+:where([data-test="moderatorAvatar"]):nth-child(n),
+:where([data-test="moderatorAvatar"]):nth-child(n) img {
+  border-radius: 50% !important;
+}
+
+:where([data-test="moderatorAvatar"], [data-test="viewerAvatar"]):nth-child(n):where([data-test="moderatorAvatar"]):nth-child(n)::before {
+  content: "" !important;
+  display: block !important;
+  position: absolute !important;
+  top: -5px !important;
+  right: -5px !important;
+  bottom: auto !important;
+  left: auto !important;
+  z-index: 2 !important;
+  width: 13px !important;
+  height: 13px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  opacity: 1 !important;
+  letter-spacing: 0 !important;
+  background: var(--theme-moderator) url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtY3Jvd24gYmFkZ2UiCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iIzVDM0QwMCIKICBzdHJva2Utd2lkdGg9IjIuNiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxwYXRoIGQ9Ik0xMS41NjIgMy4yNjZhLjUuNSAwIDAgMSAuODc2IDBMMTUuMzkgOC44N2ExIDEgMCAwIDAgMS41MTYuMjk0TDIxLjE4MyA1LjVhLjUuNSAwIDAgMSAuNzk4LjUxOWwtMi44MzQgMTAuMjQ2YTEgMSAwIDAgMS0uOTU2LjczNEg1LjgxYTEgMSAwIDAgMS0uOTU3LS43MzRMMi4wMiA2LjAyYS41LjUgMCAwIDEgLjc5OC0uNTE5bDQuMjc2IDMuNjY0YTEgMSAwIDAgMCAxLjUxNi0uMjk0eiIgLz4KICA8cGF0aCBkPSJNNSAyMWgxNCIgLz4KPC9zdmc+Cg==") center / 8px no-repeat !important;
+  box-shadow: 0 0 0 1.5px #fff !important;
+  pointer-events: none;
+}
+
+[dir="rtl"] :where([data-test="moderatorAvatar"], [data-test="viewerAvatar"]):nth-child(n):where([data-test="moderatorAvatar"]):nth-child(n)::before {
+  right: auto !important;
+  left: -5px !important;
+}
+
+/*
+ * Presenter: a blue badge on the bottom right of the avatar in the user list.
+ * The avatar's own ::after is hidden and unused in the user list; its client
+ * styles (font glyph, zero size, border) are reset here.
+ */
+:where([data-test="userListItem"], [data-test="userListItemCurrent"]):nth-child(n) > :not(*)::after {
+  content: "" !important;
+  display: block !important;
+  position: absolute !important;
+  top: auto !important;
+  left: auto !important;
+  right: -5px !important;
+  bottom: -5px !important;
+  z-index: 2 !important;
+  width: 14px !important;
+  height: 14px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  opacity: 1 !important;
+  background: var(--theme-primary) url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtcHJlc2VudGF0aW9uIGJhZGdlIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9IiNGRkZGRkYiCiAgc3Ryb2tlLXdpZHRoPSIyLjYiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJNMiAzaDIwIiAvPgogIDxwYXRoIGQ9Ik0yMSAzdjExYTIgMiAwIDAgMS0yIDJINWEyIDIgMCAwIDEtMi0yVjMiIC8+CiAgPHBhdGggZD0ibTcgMjEgNS01IDUgNSIgLz4KPC9zdmc+Cg==") center / 8px no-repeat !important;
+  box-shadow: 0 0 0 1.5px #fff !important;
+  pointer-events: none;
+}
+
+/* Users: search box with some room */
+:where([data-test="userListPanel"] div:has(> input)):nth-child(n) {
+  margin: 16px !important;
+  border-radius: 8px !important;
+}
+
+/* ---------- Action bar (microphone, camera...) ---------- */
+
+/* 40px controls with 20px icons (the size Meet uses), 10px corners like the icon bar */
+:where(#ActionsBar):nth-child(n) :where(button[color]:has(> span[color])):nth-child(n) > :where(button[color] > span[color]):nth-child(n) {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 10px !important;
+}
+
+:where(#ActionsBar):nth-child(n) :where(button[color] > span[color]):nth-child(n) > i {
+  font-size: 20px !important;
+}
+
+/* Presentation / media area: keep the single capsule, same height as the other buttons */
+:where(#ActionsBar div:has(> [data-test="mediaAreaButton"])):nth-child(n) {
+  height: 40px !important;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 10px !important;
+}
+
+:where(#ActionsBar):nth-child(n) :where(#ActionsBar div:has(> [data-test="mediaAreaButton"])):nth-child(n) :where(button[color]:has(> span[color])):nth-child(n) > :where(button[color] > span[color]):nth-child(n) {
+  width: 44px !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+:where(#ActionsBar):nth-child(n) :where(button[color="primary"]):nth-child(n) > :where(button[color] > span[color]):nth-child(n),
+:where(#ActionsBar):nth-child(n) :where(#ActionsBar div:has(> [data-test="mediaAreaButton"])):nth-child(n) :where(button[color="primary"]):nth-child(n) > :where(button[color] > span[color]):nth-child(n) {
+  background: var(--theme-primary) !important;
+  color: #fff !important;
+}
+
+:where(#ActionsBar):nth-child(n) :where(button[color="primary"]):nth-child(n) > :where(button[color] > span[color]):nth-child(n) i {
+  color: #fff !important;
+}
+
+/* Soft hover, like the icon bar */
+:where(#ActionsBar):nth-child(n) :where(button[color] > span[color]):nth-child(n),
+:where([data-test="navigationSidebarContainer"] [role="button"][aria-expanded]):nth-child(n) {
+  transition: background-color .12s ease, color .12s ease;
+}
+
+/* The client turns the icon white on hover (it darkens the background), which
+   vanishes on this light hover. Keep the normal icon color. */
+:where(#ActionsBar):nth-child(n) :where(button[color="default"]):nth-child(n):hover > :where(button[color] > span[color]):nth-child(n),
+:where(#ActionsBar):nth-child(n) :where(#ActionsBar div:has(> [data-test="mediaAreaButton"])):nth-child(n) :where(button[color="default"]):nth-child(n):hover > :where(button[color] > span[color]):nth-child(n) {
+  background: #E6EBF2 !important;
+  color: var(--btn-default-color, #4E5A66) !important;
+}
+
+/* Muted microphone and camera off in red, so "I am muted" reads at a glance */
+:is(:where([data-test="unmuteMicButton"]):nth-child(n), :where([data-test="joinVideo"]):nth-child(n)) > :where(button[color] > span[color]):nth-child(n) i {
+  color: var(--theme-danger) !important;
+}
+
+/* ---------- Presentation ---------- */
+
+:where([data-test="presentationContainer"] > div:nth-child(2)):nth-child(n),
+#whiteboard-element > div:first-child {
+  border-radius: 10px !important;
+}
+
+/* ---------- Cameras ---------- */
+
+/* Fill the tile like Meet does, instead of black bars above and below the video,
+   also while the person speaks */
+:where([data-test="webcamItem"], [data-test="webcamItemTalkingUser"]):nth-child(n) video {
+  object-fit: cover !important;
+}
+
+/* Fullscreen shows the whole image, nothing cropped */
+:fullscreen video {
+  object-fit: contain !important;
+}
+
+/* Presenter badge on the top left of the presenter's camera */
+div:has(> :where([data-test="presenterVideoButton"]):nth-child(n)) {
+  border-radius: 6px !important;
+  background: rgba(0, 0, 0, .6) !important;
+}
+
+/* Name tag readable over any video, with or without the user menu */
+:where([data-test="dropdownWebcamButton"]):nth-child(n) {
+  border-radius: 6px !important;
+  background: rgba(0, 0, 0, .6) !important;
+  font-size: 12px !important;
+  line-height: 20px !important;
+}
+
+/* ---------- Top bar ---------- */
+
+/* Options (top right): a tile like the connection and leave buttons beside it,
+   instead of a bare icon on the dark background */
+:where([data-test="optionsButton"]):nth-child(n) > :where(button[color] > span[color]):nth-child(n) {
+  width: 31px !important;
+  height: 31px !important;
+  background: rgba(255, 255, 255, .12) !important;
+  color: #fff !important;
+  transition: background-color .12s ease;
+}
+
+:where([data-test="optionsButton"]):nth-child(n):hover > :where(button[color] > span[color]):nth-child(n) {
+  background: rgba(255, 255, 255, .22) !important;
+}
+
+:where([data-test="optionsButton"]):nth-child(n) > :where(button[color] > span[color]):nth-child(n) > i {
+  font-size: 16px !important;
+}
+
+/* ---------- Every other button and field: 8px corners ----------
+ * The client's Button component uses 14px (text buttons), 42px (capsules like
+ * "Start recording") or 50% (icon buttons). The action bar and icon bar rules
+ * above are more specific and keep their 10px. The small audio device arrow on
+ * the microphone stays round, and toggle switches are not buttons.
+ */
+button:not([data-test="audioDropdownMenu"]),
+:where(button[color] > span[color]):nth-child(n),
+select,
+textarea,
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+[data-test="timeIndicator"],
+[data-test="remove-reaction"],
+div:has(> [data-test="increaseRooms"]),
+:is(:where([data-test="userListItem"], [data-test="userListItemCurrent"]):nth-child(n), :where([data-test="raisedHandsListItem"]):nth-child(n), [data-test="raisedHandsListItem"]) > div:has(> div[data-test]) {
+  border-radius: 8px !important;
+}
+
+/* ---------- Notifications ---------- */
+
+.Toastify__toast {
+  border-radius: 8px !important;
+  box-shadow: 0 4px 16px rgba(16, 33, 51, .16) !important;
+}
+
+/* [polish:toast] Colored accent on the left by type (like Slack and Linear)
+   and a thin, quiet progress bar instead of the thick gray one */
+.Toastify__toast {
+  border-left: 4px solid var(--theme-primary) !important;
+}
+
+.Toastify__toast--success {
+  border-left-color: var(--theme-talking) !important;
+}
+
+.Toastify__toast--warning {
+  border-left-color: var(--theme-moderator) !important;
+}
+
+.Toastify__toast--error {
+  border-left-color: var(--theme-danger) !important;
+}
+
+.Toastify__progress-bar {
+  height: 3px !important;
+  opacity: .35 !important;
+}
+
+/* ---------- Polish ---------- */
+
+/*
+ * [polish:talking] Speaking: a green ring around the avatar (Meet, Discord)
+ * instead of the client's pulse, a copy of the avatar that grows and fades.
+ * The client draws the pulse on the avatar's first child; it is turned off
+ * there and the ring goes on the avatar itself, keyed by its static class.
+ */
+:where([data-test="moderatorAvatar"], [data-test="viewerAvatar"]):nth-child(n) > div:first-child {
+  animation: none !important;
+  background-color: transparent !important;
+}
+
+:where([data-test="moderatorAvatar"], [data-test="viewerAvatar"]):nth-child(n) > div:first-child::before {
+  display: none !important;
+}
+
+:not(*) {
+  animation: theme-talking 1.1s ease-in-out infinite alternate;
+}
+
+@keyframes theme-talking {
+  from {
+    box-shadow: 0 0 0 2px var(--theme-talking), 0 0 0 2px rgba(34, 197, 94, .25);
+  }
+  to {
+    box-shadow: 0 0 0 2px var(--theme-talking), 0 0 0 6px rgba(34, 197, 94, .25);
+  }
+}
+
+/* Reduced motion: the ring stays, without the breathing */
+@media (prefers-reduced-motion: reduce) {
+  :not(*) {
+    animation: none !important;
+    box-shadow: 0 0 0 2px var(--theme-talking), 0 0 0 5px rgba(34, 197, 94, .25);
+  }
+}
+
+/* [polish:webcam] Tiles: a hairline instead of the thick gray frame, and a
+   green frame with a soft glow on whoever speaks (Meet, Zoom) */
+:where([data-test="webcamItem"], [data-test="webcamItemTalkingUser"]):nth-child(n)::after {
+  border: 1px solid rgba(255, 255, 255, .10) !important;
+  transition: border-color .15s ease, box-shadow .15s ease !important;
+}
+
+:where([data-test="webcamItemTalkingUser"]):nth-child(n)::after {
+  border: 3px solid var(--theme-talking) !important;
+  box-shadow: 0 0 16px rgba(34, 197, 94, .35) !important;
+}
+
+/* Name tag: the client draws a second, wider dark box behind it */
+div:has(> :where([data-test="dropdownWebcamButton"]):nth-child(n)) {
+  background: transparent !important;
+}
+
+/* [polish:chat] Messages: room between people, quieter time, pill-shaped
+   system notices ("X is now the presenter") */
+:where(.chat-message-container):nth-child(n):has(:where(.chat-message-container div:has(> time) > div:first-child):nth-child(n)):not(:first-child) {
+  margin-top: 20px !important;
+}
+
+:where(.chat-message-container):nth-child(n) .chat-message-content {
+  border-radius: 12px !important;
+}
+
+:where(.chat-message-container div:has(> time) > div:first-child):nth-child(n) {
+  font-weight: 600 !important;
+}
+
+/* The header time, and the one the client shows on hover in the bubble's
+   corner (system notices and follow-up messages from the same person) */
+:where(.chat-message-container time):nth-child(n),
+[data-test="chatMessageFooterTime"] {
+  font-size: .75rem !important;
+  font-style: normal !important;
+  color: #8A939E !important;
+}
+
+:where(.chat-message-container:not([data-message-type="default"])):nth-child(n) [data-test="chatMessageNotificationContent"] {
+  display: flex;
+  justify-content: center;
+}
+
+:where(.chat-message-container:not([data-message-type="default"])):nth-child(n) [data-test="chatMessageNotificationContent"] p {
+  display: inline-block !important;
+  margin: 0 !important;
+  padding: 4px 12px !important;
+  border-radius: 999px;
+  background: #F1F3F6;
+  color: #5B6672 !important;
+  font-size: .8rem !important;
+  line-height: 1.4 !important;
+}
+
+/* Softer scroll shadow at the top and bottom of the message list */
+#chat-list {
+  background:
+    linear-gradient(#fff 30%, rgba(255, 255, 255, 0)),
+    linear-gradient(rgba(255, 255, 255, 0), #fff 70%) 0 100%,
+    radial-gradient(farthest-side at 50% 0, rgba(16, 33, 51, .08), transparent),
+    radial-gradient(farthest-side at 50% 100%, rgba(16, 33, 51, .08), transparent) 0 100% !important;
+  background-repeat: no-repeat !important;
+  background-size: 100% 40px, 100% 40px, 100% 10px, 100% 10px !important;
+  background-attachment: local, local, scroll, scroll !important;
+}
+
+/* [polish:users] User list: soft hover on each person, and the actions
+   capsule only gets its gray box on hover, so the list reads calmer */
+/* The raised hands rows at the top reuse the user list item: same look.
+   .bbb-raised-hands__item comes from bigbluebutton/bigbluebutton#26415; data-test covers earlier versions */
+:is(:where([data-test="userListItem"], [data-test="userListItemCurrent"]):nth-child(n), :where([data-test="raisedHandsListItem"]):nth-child(n), [data-test="raisedHandsListItem"]) {
+  border-radius: 10px !important;
+  transition: background-color .12s ease;
+}
+
+:is(:where([data-test="userListItem"], [data-test="userListItemCurrent"]):nth-child(n), :where([data-test="raisedHandsListItem"]):nth-child(n), [data-test="raisedHandsListItem"]):hover {
+  background-color: #F4F6FA !important;
+}
+
+:is(:where([data-test="userListItem"], [data-test="userListItemCurrent"]):nth-child(n), :where([data-test="raisedHandsListItem"]):nth-child(n), [data-test="raisedHandsListItem"]) > div:has(> div[data-test]) {
+  background: transparent !important;
+  transition: background-color .12s ease;
+}
+
+:is(:where([data-test="userListItem"], [data-test="userListItemCurrent"]):nth-child(n), :where([data-test="raisedHandsListItem"]):nth-child(n), [data-test="raisedHandsListItem"]):hover > div:has(> div[data-test]) {
+  background: #E9EDF3 !important;
+}
+
+/* Search field: blue focus like the chat box, not the client's thick gray ring */
+:where([data-test="userListPanel"] div:has(> input)):nth-child(n):focus-within,
+:where([data-test="userListPanel"] div:has(> input)):nth-child(n) input:focus {
+  outline: none !important;
+}
+
+:where([data-test="userListPanel"] div:has(> input)):nth-child(n):has(input:focus) {
+  border-color: var(--theme-primary) !important;
+  box-shadow: 0 0 0 3px rgba(15, 112, 215, .18) !important;
+}
+
+/* [polish:footer] "Mute all" and "Lock viewers": one button each, icon and
+   text together, instead of a caption over a big gray box. The real button
+   stretches over the whole box (::after), so the whole box is clickable. */
+:where([data-test="userListPanel"]):nth-child(n) > div:last-child:has(> div > [data-test="muteAllUsers"], > div > [data-test="lockViewersButton"]) {
+  gap: 8px;
+}
+
+:where([data-test="userListPanel"]):nth-child(n) > div:last-child > div:has(> [data-test="muteAllUsers"], > [data-test="lockViewersButton"]) {
+  position: relative;
+  display: flex !important;
+  flex-direction: row-reverse !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px !important;
+  box-sizing: border-box;
+  border: 1px solid #DCE1E8;
+  border-radius: 10px;
+  background: #fff;
+  transition: background-color .12s ease, border-color .12s ease;
+}
+
+:where([data-test="userListPanel"]):nth-child(n) > div:last-child > div:has(> [data-test="muteAllUsers"], > [data-test="lockViewersButton"]):hover {
+  border-color: #C5CDD8;
+  background: #F4F6FA;
+}
+
+:where([data-test="userListPanel"]):nth-child(n) > div:last-child > div > span {
+  margin: 0 !important;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: .85rem !important;
+  font-weight: 500 !important;
+  color: var(--theme-text) !important;
+}
+
+:where([data-test="userListPanel"]):nth-child(n) > div:last-child > div > :is([data-test="muteAllUsers"], [data-test="lockViewersButton"]) {
+  position: static !important;
+  flex: 0 0 auto;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+:where([data-test="userListPanel"]):nth-child(n) > div:last-child > div > :is([data-test="muteAllUsers"], [data-test="lockViewersButton"])::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+}
+
+/* [polish:badge] Unread chat dot: ringed in the bar color so it stands off
+   the icon, like the badges on phone apps */
+:not(*)::after {
+  width: 10px !important;
+  height: 10px !important;
+  box-sizing: content-box !important;
+  border: 2px solid var(--theme-nav) !important;
+  background-color: var(--theme-danger) !important;
+}
+
+/* [polish:panel] Panel titles a touch bolder, like app section headers */
+:where([data-test="sidebarContentMain"] header h2):nth-child(n) {
+  font-weight: 600 !important;
+  letter-spacing: -.01em;
+}
+
+/*
+ * [polish:mobile] Touch screens: 44px targets in the action bar (Apple's
+ * minimum), and a 16px chat box, since iOS zooms the page into any field
+ * with a smaller font.
+ */
+@media (pointer: coarse) {
+  :where(#ActionsBar):nth-child(n) :where(button[color]:has(> span[color])):nth-child(n) > :where(button[color] > span[color]):nth-child(n) {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  :where(#ActionsBar div:has(> [data-test="mediaAreaButton"])):nth-child(n) {
+    height: 44px !important;
+  }
+
+  #message-input {
+    font-size: 16px !important;
+  }
+}
+
+/* ---------- Accessibility ---------- */
+
+/*
+ * Visible focus ring, only for keyboard navigation. Text fields are left out:
+ * they match :focus-visible on a mouse click too, and the chat box already
+ * highlights its whole container.
+ */
+:is(button, [role="button"], a, select, [role="tab"], [role="menuitem"]):focus-visible {
+  outline: 2px solid var(--theme-primary) !important;
+  outline-offset: 2px !important;
+}
+
+/* Respect the system "reduce motion" setting */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* ---------- Icons (Lucide, ISC, see icons/LICENSE) ----------
+ * Replaces the bbb-icons font glyph with an SVG used as a mask, so the icon
+ * still takes the text color (currentColor). Only in the icon bar, the action
+ * bar, the user list, the options button and the dropdown menus (the :is() at
+ * the start of each rule); icons elsewhere keep the client defaults.
+ */
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) :is(
+  .icon-bbb-mute,
+  .icon-bbb-unmute,
+  .icon-bbb-listen,
+  .icon-bbb-audio_on,
+  .icon-bbb-audio_off,
+  .icon-bbb-no_audio,
+  .icon-bbb-video,
+  .icon-bbb-video_off,
+  .icon-bbb-desktop,
+  .icon-bbb-desktop_off,
+  .icon-bbb-reactions,
+  .icon-bbb-happy,
+  .icon-bbb-hand,
+  .icon-bbb-hand_off,
+  .icon-bbb-presentation,
+  .icon-bbb-presentation_off,
+  .icon-bbb-profile,
+  .icon-bbb-user_list,
+  .icon-bbb-group_chat,
+  .icon-bbb-shared_notes,
+  .icon-bbb-widgets,
+  .icon-bbb-rooms,
+  .icon-bbb-polling,
+  .icon-bbb-time,
+  .icon-bbb-learning_dashboard,
+  .icon-bbb-settings,
+  .icon-bbb-pen_tool,
+  .icon-bbb-pen_tool_off,
+  .icon-bbb-more,
+  .icon-bbb-promote,
+  .icon-bbb-user,
+  .icon-bbb-lock,
+  .icon-bbb-unlock,
+  .icon-bbb-check,
+  .icon-bbb-fullscreen,
+  .icon-bbb-logout,
+  .icon-bbb-delete,
+  .icon-bbb-template_download,
+  .icon-bbb-search,
+  [data-test="removeUser"] .icon-bbb-circle_close,
+  :is([data-test="endMeetingButton"], [data-test="toolVisibility"], [data-test="remove-reaction"]) .icon-bbb-close
+)::before {
+  content: "" !important;
+  display: block;
+  width: 1em;
+  height: 1em;
+  background-color: currentColor;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+/* Action bar */
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-mute::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtbWljLW9mZiIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPGxpbmUgeDE9IjIiIHgyPSIyMiIgeTE9IjIiIHkyPSIyMiIgLz4KICA8cGF0aCBkPSJNMTguODkgMTMuMjNBNy4xMiA3LjEyIDAgMCAwIDE5IDEydi0yIiAvPgogIDxwYXRoIGQ9Ik01IDEwdjJhNyA3IDAgMCAwIDEyIDUiIC8+CiAgPHBhdGggZD0iTTE1IDkuMzRWNWEzIDMgMCAwIDAtNS42OC0xLjMzIiAvPgogIDxwYXRoIGQ9Ik05IDl2M2EzIDMgMCAwIDAgNS4xMiAyLjEyIiAvPgogIDxsaW5lIHgxPSIxMiIgeDI9IjEyIiB5MT0iMTkiIHkyPSIyMiIgLz4KPC9zdmc+Cg==");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtbWljLW9mZiIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPGxpbmUgeDE9IjIiIHgyPSIyMiIgeTE9IjIiIHkyPSIyMiIgLz4KICA8cGF0aCBkPSJNMTguODkgMTMuMjNBNy4xMiA3LjEyIDAgMCAwIDE5IDEydi0yIiAvPgogIDxwYXRoIGQ9Ik01IDEwdjJhNyA3IDAgMCAwIDEyIDUiIC8+CiAgPHBhdGggZD0iTTE1IDkuMzRWNWEzIDMgMCAwIDAtNS42OC0xLjMzIiAvPgogIDxwYXRoIGQ9Ik05IDl2M2EzIDMgMCAwIDAgNS4xMiAyLjEyIiAvPgogIDxsaW5lIHgxPSIxMiIgeDI9IjEyIiB5MT0iMTkiIHkyPSIyMiIgLz4KPC9zdmc+Cg==");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-unmute::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtbWljIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJNMTIgMmEzIDMgMCAwIDAtMyAzdjdhMyAzIDAgMCAwIDYgMFY1YTMgMyAwIDAgMC0zLTNaIiAvPgogIDxwYXRoIGQ9Ik0xOSAxMHYyYTcgNyAwIDAgMS0xNCAwdi0yIiAvPgogIDxsaW5lIHgxPSIxMiIgeDI9IjEyIiB5MT0iMTkiIHkyPSIyMiIgLz4KPC9zdmc+Cg==");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtbWljIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJNMTIgMmEzIDMgMCAwIDAtMyAzdjdhMyAzIDAgMCAwIDYgMFY1YTMgMyAwIDAgMC0zLTNaIiAvPgogIDxwYXRoIGQ9Ik0xOSAxMHYyYTcgNyAwIDAgMS0xNCAwdi0yIiAvPgogIDxsaW5lIHgxPSIxMiIgeDI9IjEyIiB5MT0iMTkiIHkyPSIyMiIgLz4KPC9zdmc+Cg==");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-listen::before,
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-audio_on::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtaGVhZHBob25lcyIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHBhdGggZD0iTTMgMTRoM2EyIDIgMCAwIDEgMiAydjNhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJ2LTdhOSA5IDAgMCAxIDE4IDB2N2EyIDIgMCAwIDEtMiAyaC0xYTIgMiAwIDAgMS0yLTJ2LTNhMiAyIDAgMCAxIDItMmgzIiAvPgo8L3N2Zz4K");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtaGVhZHBob25lcyIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHBhdGggZD0iTTMgMTRoM2EyIDIgMCAwIDEgMiAydjNhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJ2LTdhOSA5IDAgMCAxIDE4IDB2N2EyIDIgMCAwIDEtMiAyaC0xYTIgMiAwIDAgMS0yLTJ2LTNhMiAyIDAgMCAxIDItMmgzIiAvPgo8L3N2Zz4K");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-audio_off::before,
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-no_audio::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtaGVhZHBob25lLW9mZiIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHBhdGggZD0iTTIxIDE0aC0xLjM0MyIgLz4KICA8cGF0aCBkPSJNOS4xMjggMy40N0E5IDkgMCAwIDEgMjEgMTJ2My4zNDMiIC8+CiAgPHBhdGggZD0ibTIgMiAyMCAyMCIgLz4KICA8cGF0aCBkPSJNMjAuNDE0IDIwLjQxNEEyIDIgMCAwIDEgMTkgMjFoLTFhMiAyIDAgMCAxLTItMnYtMyIgLz4KICA8cGF0aCBkPSJNMyAxNGgzYTIgMiAwIDAgMSAyIDJ2M2EyIDIgMCAwIDEtMiAySDVhMiAyIDAgMCAxLTItMnYtN2E5IDkgMCAwIDEgMi42MzYtNi4zNjQiIC8+Cjwvc3ZnPgo=");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtaGVhZHBob25lLW9mZiIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHBhdGggZD0iTTIxIDE0aC0xLjM0MyIgLz4KICA8cGF0aCBkPSJNOS4xMjggMy40N0E5IDkgMCAwIDEgMjEgMTJ2My4zNDMiIC8+CiAgPHBhdGggZD0ibTIgMiAyMCAyMCIgLz4KICA8cGF0aCBkPSJNMjAuNDE0IDIwLjQxNEEyIDIgMCAwIDEgMTkgMjFoLTFhMiAyIDAgMCAxLTItMnYtMyIgLz4KICA8cGF0aCBkPSJNMyAxNGgzYTIgMiAwIDAgMSAyIDJ2M2EyIDIgMCAwIDEtMiAySDVhMiAyIDAgMCAxLTItMnYtN2E5IDkgMCAwIDEgMi42MzYtNi4zNjQiIC8+Cjwvc3ZnPgo=");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-video::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtdmlkZW8iCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxwYXRoIGQ9Im0xNiAxMyA1LjIyMyAzLjQ4MmEuNS41IDAgMCAwIC43NzctLjQxNlY3Ljg3YS41LjUgMCAwIDAtLjc1Mi0uNDMyTDE2IDEwLjUiIC8+CiAgPHJlY3QgeD0iMiIgeT0iNiIgd2lkdGg9IjE0IiBoZWlnaHQ9IjEyIiByeD0iMiIgLz4KPC9zdmc+Cg==");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtdmlkZW8iCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxwYXRoIGQ9Im0xNiAxMyA1LjIyMyAzLjQ4MmEuNS41IDAgMCAwIC43NzctLjQxNlY3Ljg3YS41LjUgMCAwIDAtLjc1Mi0uNDMyTDE2IDEwLjUiIC8+CiAgPHJlY3QgeD0iMiIgeT0iNiIgd2lkdGg9IjE0IiBoZWlnaHQ9IjEyIiByeD0iMiIgLz4KPC9zdmc+Cg==");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-video_off::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtdmlkZW8tb2ZmIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJNMTAuNjYgNkgxNGEyIDIgMCAwIDEgMiAydjIuNWw1LjI0OC0zLjA2MkEuNS41IDAgMCAxIDIyIDcuODd2OC4xOTYiIC8+CiAgPHBhdGggZD0iTTE2IDE2YTIgMiAwIDAgMS0yIDJINGEyIDIgMCAwIDEtMi0yVjhhMiAyIDAgMCAxIDItMmgyIiAvPgogIDxwYXRoIGQ9Im0yIDIgMjAgMjAiIC8+Cjwvc3ZnPgo=");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtdmlkZW8tb2ZmIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJNMTAuNjYgNkgxNGEyIDIgMCAwIDEgMiAydjIuNWw1LjI0OC0zLjA2MkEuNS41IDAgMCAxIDIyIDcuODd2OC4xOTYiIC8+CiAgPHBhdGggZD0iTTE2IDE2YTIgMiAwIDAgMS0yIDJINGEyIDIgMCAwIDEtMi0yVjhhMiAyIDAgMCAxIDItMmgyIiAvPgogIDxwYXRoIGQ9Im0yIDIgMjAgMjAiIC8+Cjwvc3ZnPgo=");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-desktop::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtc2NyZWVuLXNoYXJlIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJNMTMgM0g0YTIgMiAwIDAgMC0yIDJ2MTBhMiAyIDAgMCAwIDIgMmgxNmEyIDIgMCAwIDAgMi0ydi0zIiAvPgogIDxwYXRoIGQ9Ik04IDIxaDgiIC8+CiAgPHBhdGggZD0iTTEyIDE3djQiIC8+CiAgPHBhdGggZD0ibTE3IDggNS01IiAvPgogIDxwYXRoIGQ9Ik0xNyAzaDV2NSIgLz4KPC9zdmc+Cg==");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtc2NyZWVuLXNoYXJlIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJNMTMgM0g0YTIgMiAwIDAgMC0yIDJ2MTBhMiAyIDAgMCAwIDIgMmgxNmEyIDIgMCAwIDAgMi0ydi0zIiAvPgogIDxwYXRoIGQ9Ik04IDIxaDgiIC8+CiAgPHBhdGggZD0iTTEyIDE3djQiIC8+CiAgPHBhdGggZD0ibTE3IDggNS01IiAvPgogIDxwYXRoIGQ9Ik0xNyAzaDV2NSIgLz4KPC9zdmc+Cg==");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-desktop_off::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtc2NyZWVuLXNoYXJlLW9mZiIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHBhdGggZD0iTTEzIDNINGEyIDIgMCAwIDAtMiAydjEwYTIgMiAwIDAgMCAyIDJoMTZhMiAyIDAgMCAwIDItMnYtMyIgLz4KICA8cGF0aCBkPSJNOCAyMWg4IiAvPgogIDxwYXRoIGQ9Ik0xMiAxN3Y0IiAvPgogIDxwYXRoIGQ9Im0yMiAzLTUgNSIgLz4KICA8cGF0aCBkPSJtMTcgMyA1IDUiIC8+Cjwvc3ZnPgo=");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtc2NyZWVuLXNoYXJlLW9mZiIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHBhdGggZD0iTTEzIDNINGEyIDIgMCAwIDAtMiAydjEwYTIgMiAwIDAgMCAyIDJoMTZhMiAyIDAgMCAwIDItMnYtMyIgLz4KICA8cGF0aCBkPSJNOCAyMWg4IiAvPgogIDxwYXRoIGQ9Ik0xMiAxN3Y0IiAvPgogIDxwYXRoIGQ9Im0yMiAzLTUgNSIgLz4KICA8cGF0aCBkPSJtMTcgMyA1IDUiIC8+Cjwvc3ZnPgo=");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-reactions::before,
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-happy::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtc21pbGUtcGx1cyIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHBhdGggZD0iTTIyIDExdjFhMTAgMTAgMCAxIDEtOS0xMCIgLz4KICA8cGF0aCBkPSJNOCAxNHMxLjUgMiA0IDIgNC0yIDQtMiIgLz4KICA8bGluZSB4MT0iOSIgeDI9IjkuMDEiIHkxPSI5IiB5Mj0iOSIgLz4KICA8bGluZSB4MT0iMTUiIHgyPSIxNS4wMSIgeTE9IjkiIHkyPSI5IiAvPgogIDxwYXRoIGQ9Ik0xNiA1aDYiIC8+CiAgPHBhdGggZD0iTTE5IDJ2NiIgLz4KPC9zdmc+Cg==");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtc21pbGUtcGx1cyIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHBhdGggZD0iTTIyIDExdjFhMTAgMTAgMCAxIDEtOS0xMCIgLz4KICA8cGF0aCBkPSJNOCAxNHMxLjUgMiA0IDIgNC0yIDQtMiIgLz4KICA8bGluZSB4MT0iOSIgeDI9IjkuMDEiIHkxPSI5IiB5Mj0iOSIgLz4KICA8bGluZSB4MT0iMTUiIHgyPSIxNS4wMSIgeTE9IjkiIHkyPSI5IiAvPgogIDxwYXRoIGQ9Ik0xNiA1aDYiIC8+CiAgPHBhdGggZD0iTTE5IDJ2NiIgLz4KPC9zdmc+Cg==");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-hand::before,
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-hand_off::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtaGFuZCIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHBhdGggZD0iTTE4IDExVjZhMiAyIDAgMCAwLTItMmEyIDIgMCAwIDAtMiAyIiAvPgogIDxwYXRoIGQ9Ik0xNCAxMFY0YTIgMiAwIDAgMC0yLTJhMiAyIDAgMCAwLTIgMnYyIiAvPgogIDxwYXRoIGQ9Ik0xMCAxMC41VjZhMiAyIDAgMCAwLTItMmEyIDIgMCAwIDAtMiAydjgiIC8+CiAgPHBhdGggZD0iTTE4IDhhMiAyIDAgMSAxIDQgMHY2YTggOCAwIDAgMS04IDhoLTJjLTIuOCAwLTQuNS0uODYtNS45OS0yLjM0bC0zLjYtMy42YTIgMiAwIDAgMSAyLjgzLTIuODJMNyAxNSIgLz4KPC9zdmc+Cg==");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtaGFuZCIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHBhdGggZD0iTTE4IDExVjZhMiAyIDAgMCAwLTItMmEyIDIgMCAwIDAtMiAyIiAvPgogIDxwYXRoIGQ9Ik0xNCAxMFY0YTIgMiAwIDAgMC0yLTJhMiAyIDAgMCAwLTIgMnYyIiAvPgogIDxwYXRoIGQ9Ik0xMCAxMC41VjZhMiAyIDAgMCAwLTItMmEyIDIgMCAwIDAtMiAydjgiIC8+CiAgPHBhdGggZD0iTTE4IDhhMiAyIDAgMSAxIDQgMHY2YTggOCAwIDAgMS04IDhoLTJjLTIuOCAwLTQuNS0uODYtNS45OS0yLjM0bC0zLjYtMy42YTIgMiAwIDAgMSAyLjgzLTIuODJMNyAxNSIgLz4KPC9zdmc+Cg==");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-presentation::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtcHJlc2VudGF0aW9uIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJNMiAzaDIwIiAvPgogIDxwYXRoIGQ9Ik0yMSAzdjExYTIgMiAwIDAgMS0yIDJINWEyIDIgMCAwIDEtMi0yVjMiIC8+CiAgPHBhdGggZD0ibTcgMjEgNS01IDUgNSIgLz4KPC9zdmc+Cg==");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtcHJlc2VudGF0aW9uIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJNMiAzaDIwIiAvPgogIDxwYXRoIGQ9Ik0yMSAzdjExYTIgMiAwIDAgMS0yIDJINWEyIDIgMCAwIDEtMi0yVjMiIC8+CiAgPHBhdGggZD0ibTcgMjEgNS01IDUgNSIgLz4KPC9zdmc+Cg==");
+}
+
+/* Minimized presentation (the "restore" button): crossed, like mic and camera off */
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-presentation_off::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBCYXNlZCBvbiBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIHByZXNlbnRhdGlvbiAtIElTQywgd2l0aCB0aGUgc2xhc2ggb2YgdGhlICItb2ZmIiBpY29ucyAtLT4KPHN2ZwogIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXByZXNlbnRhdGlvbi1vZmYiCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxwYXRoIGQ9Ik03IDNoMTUiIC8+CiAgPHBhdGggZD0iTTIxIDN2MTFhMiAyIDAgMCAxLTIgMmgtMS41IiAvPgogIDxwYXRoIGQ9Ik0xNC41IDE2SDVhMiAyIDAgMCAxLTItMlY3IiAvPgogIDxwYXRoIGQ9Im03IDIxIDUtNSA1IDUiIC8+CiAgPHBhdGggZD0ibTIgMiAyMCAyMCIgLz4KPC9zdmc+Cg==");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBCYXNlZCBvbiBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIHByZXNlbnRhdGlvbiAtIElTQywgd2l0aCB0aGUgc2xhc2ggb2YgdGhlICItb2ZmIiBpY29ucyAtLT4KPHN2ZwogIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXByZXNlbnRhdGlvbi1vZmYiCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxwYXRoIGQ9Ik03IDNoMTUiIC8+CiAgPHBhdGggZD0iTTIxIDN2MTFhMiAyIDAgMCAxLTIgMmgtMS41IiAvPgogIDxwYXRoIGQ9Ik0xNC41IDE2SDVhMiAyIDAgMCAxLTItMlY3IiAvPgogIDxwYXRoIGQ9Im03IDIxIDUtNSA1IDUiIC8+CiAgPHBhdGggZD0ibTIgMiAyMCAyMCIgLz4KPC9zdmc+Cg==");
+}
+
+
+/* Icon bar */
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-profile::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtdXNlci1yb3VuZC1jb2ciCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxwYXRoIGQ9Ik0yIDIxYTggOCAwIDAgMSAxMC40MzQtNy42MiIgLz4KICA8Y2lyY2xlIGN4PSIxMCIgY3k9IjgiIHI9IjUiIC8+CiAgPGNpcmNsZSBjeD0iMTgiIGN5PSIxOCIgcj0iMyIgLz4KICA8cGF0aCBkPSJtMTkuNSAxNC4zLS40LjkiIC8+CiAgPHBhdGggZD0ibTE2LjkgMjAuOC0uNC45IiAvPgogIDxwYXRoIGQ9Im0yMS43IDE5LjUtLjktLjQiIC8+CiAgPHBhdGggZD0ibTE1LjIgMTYuOS0uOS0uNCIgLz4KICA8cGF0aCBkPSJtMjEuNyAxNi41LS45LjQiIC8+CiAgPHBhdGggZD0ibTE1LjIgMTkuMS0uOS40IiAvPgogIDxwYXRoIGQ9Im0xOS41IDIxLjctLjQtLjkiIC8+CiAgPHBhdGggZD0ibTE2LjkgMTUuMi0uNC0uOSIgLz4KPC9zdmc+Cg==");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtdXNlci1yb3VuZC1jb2ciCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxwYXRoIGQ9Ik0yIDIxYTggOCAwIDAgMSAxMC40MzQtNy42MiIgLz4KICA8Y2lyY2xlIGN4PSIxMCIgY3k9IjgiIHI9IjUiIC8+CiAgPGNpcmNsZSBjeD0iMTgiIGN5PSIxOCIgcj0iMyIgLz4KICA8cGF0aCBkPSJtMTkuNSAxNC4zLS40LjkiIC8+CiAgPHBhdGggZD0ibTE2LjkgMjAuOC0uNC45IiAvPgogIDxwYXRoIGQ9Im0yMS43IDE5LjUtLjktLjQiIC8+CiAgPHBhdGggZD0ibTE1LjIgMTYuOS0uOS0uNCIgLz4KICA8cGF0aCBkPSJtMjEuNyAxNi41LS45LjQiIC8+CiAgPHBhdGggZD0ibTE1LjIgMTkuMS0uOS40IiAvPgogIDxwYXRoIGQ9Im0xOS41IDIxLjctLjQtLjkiIC8+CiAgPHBhdGggZD0ibTE2LjkgMTUuMi0uNC0uOSIgLz4KPC9zdmc+Cg==");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-user_list::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtdXNlcnMiCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxwYXRoIGQ9Ik0xNiAyMXYtMmE0IDQgMCAwIDAtNC00SDZhNCA0IDAgMCAwLTQgNHYyIiAvPgogIDxjaXJjbGUgY3g9IjkiIGN5PSI3IiByPSI0IiAvPgogIDxwYXRoIGQ9Ik0yMiAyMXYtMmE0IDQgMCAwIDAtMy0zLjg3IiAvPgogIDxwYXRoIGQ9Ik0xNiAzLjEzYTQgNCAwIDAgMSAwIDcuNzUiIC8+Cjwvc3ZnPgo=");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtdXNlcnMiCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxwYXRoIGQ9Ik0xNiAyMXYtMmE0IDQgMCAwIDAtNC00SDZhNCA0IDAgMCAwLTQgNHYyIiAvPgogIDxjaXJjbGUgY3g9IjkiIGN5PSI3IiByPSI0IiAvPgogIDxwYXRoIGQ9Ik0yMiAyMXYtMmE0IDQgMCAwIDAtMy0zLjg3IiAvPgogIDxwYXRoIGQ9Ik0xNiAzLjEzYTQgNCAwIDAgMSAwIDcuNzUiIC8+Cjwvc3ZnPgo=");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-group_chat::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtbWVzc2FnZXMtc3F1YXJlIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJNMTQgOWEyIDIgMCAwIDEtMiAySDZsLTQgNFY0YTIgMiAwIDAgMSAyLTJoOGEyIDIgMCAwIDEgMiAyeiIgLz4KICA8cGF0aCBkPSJNMTggOWgyYTIgMiAwIDAgMSAyIDJ2MTFsLTQtNGgtNmEyIDIgMCAwIDEtMi0ydi0xIiAvPgo8L3N2Zz4K");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtbWVzc2FnZXMtc3F1YXJlIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJNMTQgOWEyIDIgMCAwIDEtMiAySDZsLTQgNFY0YTIgMiAwIDAgMSAyLTJoOGEyIDIgMCAwIDEgMiAyeiIgLz4KICA8cGF0aCBkPSJNMTggOWgyYTIgMiAwIDAgMSAyIDJ2MTFsLTQtNGgtNmEyIDIgMCAwIDEtMi0ydi0xIiAvPgo8L3N2Zz4K");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-shared_notes::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtbm90ZWJvb2stcGVuIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJNMTMuNCAySDZhMiAyIDAgMCAwLTIgMnYxNmEyIDIgMCAwIDAgMiAyaDEyYTIgMiAwIDAgMCAyLTJ2LTcuNCIgLz4KICA8cGF0aCBkPSJNMiA2aDQiIC8+CiAgPHBhdGggZD0iTTIgMTBoNCIgLz4KICA8cGF0aCBkPSJNMiAxNGg0IiAvPgogIDxwYXRoIGQ9Ik0yIDE4aDQiIC8+CiAgPHBhdGggZD0iTTIxLjM3OCA1LjYyNmExIDEgMCAxIDAtMy4wMDQtMy4wMDRsLTUuMDEgNS4wMTJhMiAyIDAgMCAwLS41MDYuODU0bC0uODM3IDIuODdhLjUuNSAwIDAgMCAuNjIuNjJsMi44Ny0uODM3YTIgMiAwIDAgMCAuODU0LS41MDZ6IiAvPgo8L3N2Zz4K");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtbm90ZWJvb2stcGVuIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJNMTMuNCAySDZhMiAyIDAgMCAwLTIgMnYxNmEyIDIgMCAwIDAgMiAyaDEyYTIgMiAwIDAgMCAyLTJ2LTcuNCIgLz4KICA8cGF0aCBkPSJNMiA2aDQiIC8+CiAgPHBhdGggZD0iTTIgMTBoNCIgLz4KICA8cGF0aCBkPSJNMiAxNGg0IiAvPgogIDxwYXRoIGQ9Ik0yIDE4aDQiIC8+CiAgPHBhdGggZD0iTTIxLjM3OCA1LjYyNmExIDEgMCAxIDAtMy4wMDQtMy4wMDRsLTUuMDEgNS4wMTJhMiAyIDAgMCAwLS41MDYuODU0bC0uODM3IDIuODdhLjUuNSAwIDAgMCAuNjIuNjJsMi44Ny0uODM3YTIgMiAwIDAgMCAuODU0LS41MDZ6IiAvPgo8L3N2Zz4K");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-widgets::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtbGF5b3V0LWdyaWQiCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxyZWN0IHdpZHRoPSI3IiBoZWlnaHQ9IjciIHg9IjMiIHk9IjMiIHJ4PSIxIiAvPgogIDxyZWN0IHdpZHRoPSI3IiBoZWlnaHQ9IjciIHg9IjE0IiB5PSIzIiByeD0iMSIgLz4KICA8cmVjdCB3aWR0aD0iNyIgaGVpZ2h0PSI3IiB4PSIxNCIgeT0iMTQiIHJ4PSIxIiAvPgogIDxyZWN0IHdpZHRoPSI3IiBoZWlnaHQ9IjciIHg9IjMiIHk9IjE0IiByeD0iMSIgLz4KPC9zdmc+Cg==");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtbGF5b3V0LWdyaWQiCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxyZWN0IHdpZHRoPSI3IiBoZWlnaHQ9IjciIHg9IjMiIHk9IjMiIHJ4PSIxIiAvPgogIDxyZWN0IHdpZHRoPSI3IiBoZWlnaHQ9IjciIHg9IjE0IiB5PSIzIiByeD0iMSIgLz4KICA8cmVjdCB3aWR0aD0iNyIgaGVpZ2h0PSI3IiB4PSIxNCIgeT0iMTQiIHJ4PSIxIiAvPgogIDxyZWN0IHdpZHRoPSI3IiBoZWlnaHQ9IjciIHg9IjMiIHk9IjE0IiByeD0iMSIgLz4KPC9zdmc+Cg==");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-rooms::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtZG9vci1vcGVuIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJNMTMgNGgzYTIgMiAwIDAgMSAyIDJ2MTQiIC8+CiAgPHBhdGggZD0iTTIgMjBoMyIgLz4KICA8cGF0aCBkPSJNMTMgMjBoOSIgLz4KICA8cGF0aCBkPSJNMTAgMTJ2LjAxIiAvPgogIDxwYXRoIGQ9Ik0xMyA0LjU2MnYxNi4xNTdhMSAxIDAgMCAxLTEuMjQyLjk3TDUgMjBWNS41NjJhMiAyIDAgMCAxIDEuNTE1LTEuOTRsNC0xQTIgMiAwIDAgMSAxMyA0LjU2MVoiIC8+Cjwvc3ZnPgo=");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtZG9vci1vcGVuIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJNMTMgNGgzYTIgMiAwIDAgMSAyIDJ2MTQiIC8+CiAgPHBhdGggZD0iTTIgMjBoMyIgLz4KICA8cGF0aCBkPSJNMTMgMjBoOSIgLz4KICA8cGF0aCBkPSJNMTAgMTJ2LjAxIiAvPgogIDxwYXRoIGQ9Ik0xMyA0LjU2MnYxNi4xNTdhMSAxIDAgMCAxLTEuMjQyLjk3TDUgMjBWNS41NjJhMiAyIDAgMCAxIDEuNTE1LTEuOTRsNC0xQTIgMiAwIDAgMSAxMyA0LjU2MVoiIC8+Cjwvc3ZnPgo=");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-polling::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtY2hhcnQtY29sdW1uIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJNMyAzdjE2YTIgMiAwIDAgMCAyIDJoMTYiIC8+CiAgPHBhdGggZD0iTTE4IDE3VjkiIC8+CiAgPHBhdGggZD0iTTEzIDE3VjUiIC8+CiAgPHBhdGggZD0iTTggMTd2LTMiIC8+Cjwvc3ZnPgo=");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtY2hhcnQtY29sdW1uIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJNMyAzdjE2YTIgMiAwIDAgMCAyIDJoMTYiIC8+CiAgPHBhdGggZD0iTTE4IDE3VjkiIC8+CiAgPHBhdGggZD0iTTEzIDE3VjUiIC8+CiAgPHBhdGggZD0iTTggMTd2LTMiIC8+Cjwvc3ZnPgo=");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-time::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtdGltZXIiCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxsaW5lIHgxPSIxMCIgeDI9IjE0IiB5MT0iMiIgeTI9IjIiIC8+CiAgPGxpbmUgeDE9IjEyIiB4Mj0iMTUiIHkxPSIxNCIgeTI9IjExIiAvPgogIDxjaXJjbGUgY3g9IjEyIiBjeT0iMTQiIHI9IjgiIC8+Cjwvc3ZnPgo=");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtdGltZXIiCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxsaW5lIHgxPSIxMCIgeDI9IjE0IiB5MT0iMiIgeTI9IjIiIC8+CiAgPGxpbmUgeDE9IjEyIiB4Mj0iMTUiIHkxPSIxNCIgeTI9IjExIiAvPgogIDxjaXJjbGUgY3g9IjEyIiBjeT0iMTQiIHI9IjgiIC8+Cjwvc3ZnPgo=");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-learning_dashboard::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtY2hhcnQtbm8tYXhlcy1jb21iaW5lZCIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHBhdGggZD0iTTEyIDE2djUiIC8+CiAgPHBhdGggZD0iTTE2IDE0djciIC8+CiAgPHBhdGggZD0iTTIwIDEwdjExIiAvPgogIDxwYXRoIGQ9Im0yMiAzLTguNjQ2IDguNjQ2YS41LjUgMCAwIDEtLjcwOCAwTDkuMzU0IDguMzU0YS41LjUgMCAwIDAtLjcwNyAwTDIgMTUiIC8+CiAgPHBhdGggZD0iTTQgMTh2MyIgLz4KICA8cGF0aCBkPSJNOCAxNHY3IiAvPgo8L3N2Zz4K");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtY2hhcnQtbm8tYXhlcy1jb21iaW5lZCIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHBhdGggZD0iTTEyIDE2djUiIC8+CiAgPHBhdGggZD0iTTE2IDE0djciIC8+CiAgPHBhdGggZD0iTTIwIDEwdjExIiAvPgogIDxwYXRoIGQ9Im0yMiAzLTguNjQ2IDguNjQ2YS41LjUgMCAwIDEtLjcwOCAwTDkuMzU0IDguMzU0YS41LjUgMCAwIDAtLjcwNyAwTDIgMTUiIC8+CiAgPHBhdGggZD0iTTQgMTh2MyIgLz4KICA8cGF0aCBkPSJNOCAxNHY3IiAvPgo8L3N2Zz4K");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-settings::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtc2V0dGluZ3MiCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxwYXRoIGQ9Ik0xMi4yMiAyaC0uNDRhMiAyIDAgMCAwLTIgMnYuMThhMiAyIDAgMCAxLTEgMS43M2wtLjQzLjI1YTIgMiAwIDAgMS0yIDBsLS4xNS0uMDhhMiAyIDAgMCAwLTIuNzMuNzNsLS4yMi4zOGEyIDIgMCAwIDAgLjczIDIuNzNsLjE1LjFhMiAyIDAgMCAxIDEgMS43MnYuNTFhMiAyIDAgMCAxLTEgMS43NGwtLjE1LjA5YTIgMiAwIDAgMC0uNzMgMi43M2wuMjIuMzhhMiAyIDAgMCAwIDIuNzMuNzNsLjE1LS4wOGEyIDIgMCAwIDEgMiAwbC40My4yNWEyIDIgMCAwIDEgMSAxLjczVjIwYTIgMiAwIDAgMCAyIDJoLjQ0YTIgMiAwIDAgMCAyLTJ2LS4xOGEyIDIgMCAwIDEgMS0xLjczbC40My0uMjVhMiAyIDAgMCAxIDIgMGwuMTUuMDhhMiAyIDAgMCAwIDIuNzMtLjczbC4yMi0uMzlhMiAyIDAgMCAwLS43My0yLjczbC0uMTUtLjA4YTIgMiAwIDAgMS0xLTEuNzR2LS41YTIgMiAwIDAgMSAxLTEuNzRsLjE1LS4wOWEyIDIgMCAwIDAgLjczLTIuNzNsLS4yMi0uMzhhMiAyIDAgMCAwLTIuNzMtLjczbC0uMTUuMDhhMiAyIDAgMCAxLTIgMGwtLjQzLS4yNWEyIDIgMCAwIDEtMS0xLjczVjRhMiAyIDAgMCAwLTItMnoiIC8+CiAgPGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMyIgLz4KPC9zdmc+Cg==");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtc2V0dGluZ3MiCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxwYXRoIGQ9Ik0xMi4yMiAyaC0uNDRhMiAyIDAgMCAwLTIgMnYuMThhMiAyIDAgMCAxLTEgMS43M2wtLjQzLjI1YTIgMiAwIDAgMS0yIDBsLS4xNS0uMDhhMiAyIDAgMCAwLTIuNzMuNzNsLS4yMi4zOGEyIDIgMCAwIDAgLjczIDIuNzNsLjE1LjFhMiAyIDAgMCAxIDEgMS43MnYuNTFhMiAyIDAgMCAxLTEgMS43NGwtLjE1LjA5YTIgMiAwIDAgMC0uNzMgMi43M2wuMjIuMzhhMiAyIDAgMCAwIDIuNzMuNzNsLjE1LS4wOGEyIDIgMCAwIDEgMiAwbC40My4yNWEyIDIgMCAwIDEgMSAxLjczVjIwYTIgMiAwIDAgMCAyIDJoLjQ0YTIgMiAwIDAgMCAyLTJ2LS4xOGEyIDIgMCAwIDEgMS0xLjczbC40My0uMjVhMiAyIDAgMCAxIDIgMGwuMTUuMDhhMiAyIDAgMCAwIDIuNzMtLjczbC4yMi0uMzlhMiAyIDAgMCAwLS43My0yLjczbC0uMTUtLjA4YTIgMiAwIDAgMS0xLTEuNzR2LS41YTIgMiAwIDAgMSAxLTEuNzRsLjE1LS4wOWEyIDIgMCAwIDAgLjczLTIuNzNsLS4yMi0uMzhhMiAyIDAgMCAwLTIuNzMtLjczbC0uMTUuMDhhMiAyIDAgMCAxLTIgMGwtLjQzLS4yNWEyIDIgMCAwIDEtMS0xLjczVjRhMiAyIDAgMCAwLTItMnoiIC8+CiAgPGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMyIgLz4KPC9zdmc+Cg==");
+}
+
+/* User list and its menu */
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-pen_tool::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtcGVuY2lsIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJNMjEuMTc0IDYuODEyYTEgMSAwIDAgMC0zLjk4Ni0zLjk4N0wzLjg0MiAxNi4xNzRhMiAyIDAgMCAwLS41LjgzbC0xLjMyMSA0LjM1MmEuNS41IDAgMCAwIC42MjMuNjIybDQuMzUzLTEuMzJhMiAyIDAgMCAwIC44My0uNDk3eiIgLz4KICA8cGF0aCBkPSJtMTUgNSA0IDQiIC8+Cjwvc3ZnPgo=");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtcGVuY2lsIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJNMjEuMTc0IDYuODEyYTEgMSAwIDAgMC0zLjk4Ni0zLjk4N0wzLjg0MiAxNi4xNzRhMiAyIDAgMCAwLS41LjgzbC0xLjMyMSA0LjM1MmEuNS41IDAgMCAwIC42MjMuNjIybDQuMzUzLTEuMzJhMiAyIDAgMCAwIC44My0uNDk3eiIgLz4KICA8cGF0aCBkPSJtMTUgNSA0IDQiIC8+Cjwvc3ZnPgo=");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-pen_tool_off::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtcGVuY2lsLW9mZiIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHBhdGggZD0ibTEwIDEwLTYuMTU3IDYuMTYyYTIgMiAwIDAgMC0uNS44MzNsLTEuMzIyIDQuMzZhLjUuNSAwIDAgMCAuNjIyLjYyNGw0LjM1OC0xLjMyM2EyIDIgMCAwIDAgLjgzLS41TDE0IDEzLjk4MiIgLz4KICA8cGF0aCBkPSJtMTIuODI5IDcuMTcyIDQuMzU5LTQuMzQ2YTEgMSAwIDEgMSAzLjk4NiAzLjk4NmwtNC4zNTMgNC4zNTMiIC8+CiAgPHBhdGggZD0ibTE1IDUgNCA0IiAvPgogIDxwYXRoIGQ9Im0yIDIgMjAgMjAiIC8+Cjwvc3ZnPgo=");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtcGVuY2lsLW9mZiIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHBhdGggZD0ibTEwIDEwLTYuMTU3IDYuMTYyYTIgMiAwIDAgMC0uNS44MzNsLTEuMzIyIDQuMzZhLjUuNSAwIDAgMCAuNjIyLjYyNGw0LjM1OC0xLjMyM2EyIDIgMCAwIDAgLjgzLS41TDE0IDEzLjk4MiIgLz4KICA8cGF0aCBkPSJtMTIuODI5IDcuMTcyIDQuMzU5LTQuMzQ2YTEgMSAwIDEgMSAzLjk4NiAzLjk4NmwtNC4zNTMgNC4zNTMiIC8+CiAgPHBhdGggZD0ibTE1IDUgNCA0IiAvPgogIDxwYXRoIGQ9Im0yIDIgMjAgMjAiIC8+Cjwvc3ZnPgo=");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-more::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtZWxsaXBzaXMtdmVydGljYWwiCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjEiIC8+CiAgPGNpcmNsZSBjeD0iMTIiIGN5PSI1IiByPSIxIiAvPgogIDxjaXJjbGUgY3g9IjEyIiBjeT0iMTkiIHI9IjEiIC8+Cjwvc3ZnPgo=");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtZWxsaXBzaXMtdmVydGljYWwiCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjEiIC8+CiAgPGNpcmNsZSBjeD0iMTIiIGN5PSI1IiByPSIxIiAvPgogIDxjaXJjbGUgY3g9IjEyIiBjeT0iMTkiIHI9IjEiIC8+Cjwvc3ZnPgo=");
+}
+
+/* Make moderator: the same crown the moderator avatars get */
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-promote::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtY3Jvd24iCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxwYXRoIGQ9Ik0xMS41NjIgMy4yNjZhLjUuNSAwIDAgMSAuODc2IDBMMTUuMzkgOC44N2ExIDEgMCAwIDAgMS41MTYuMjk0TDIxLjE4MyA1LjVhLjUuNSAwIDAgMSAuNzk4LjUxOWwtMi44MzQgMTAuMjQ2YTEgMSAwIDAgMS0uOTU2LjczNEg1LjgxYTEgMSAwIDAgMS0uOTU3LS43MzRMMi4wMiA2LjAyYS41LjUgMCAwIDEgLjc5OC0uNTE5bDQuMjc2IDMuNjY0YTEgMSAwIDAgMCAxLjUxNi0uMjk0eiIgLz4KICA8cGF0aCBkPSJNNSAyMWgxNCIgLz4KPC9zdmc+Cg==");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtY3Jvd24iCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxwYXRoIGQ9Ik0xMS41NjIgMy4yNjZhLjUuNSAwIDAgMSAuODc2IDBMMTUuMzkgOC44N2ExIDEgMCAwIDAgMS41MTYuMjk0TDIxLjE4MyA1LjVhLjUuNSAwIDAgMSAuNzk4LjUxOWwtMi44MzQgMTAuMjQ2YTEgMSAwIDAgMS0uOTU2LjczNEg1LjgxYTEgMSAwIDAgMS0uOTU3LS43MzRMMi4wMiA2LjAyYS41LjUgMCAwIDEgLjc5OC0uNTE5bDQuMjc2IDMuNjY0YTEgMSAwIDAgMCAxLjUxNi0uMjk0eiIgLz4KICA8cGF0aCBkPSJNNSAyMWgxNCIgLz4KPC9zdmc+Cg==");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-user::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtdXNlci1yb3VuZCIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPGNpcmNsZSBjeD0iMTIiIGN5PSI4IiByPSI1IiAvPgogIDxwYXRoIGQ9Ik0yMCAyMWE4IDggMCAwIDAtMTYgMCIgLz4KPC9zdmc+Cg==");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtdXNlci1yb3VuZCIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPGNpcmNsZSBjeD0iMTIiIGN5PSI4IiByPSI1IiAvPgogIDxwYXRoIGQ9Ik0yMCAyMWE4IDggMCAwIDAtMTYgMCIgLz4KPC9zdmc+Cg==");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-lock::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtbG9jayIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHJlY3Qgd2lkdGg9IjE4IiBoZWlnaHQ9IjExIiB4PSIzIiB5PSIxMSIgcng9IjIiIHJ5PSIyIiAvPgogIDxwYXRoIGQ9Ik03IDExVjdhNSA1IDAgMCAxIDEwIDB2NCIgLz4KPC9zdmc+Cg==");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtbG9jayIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHJlY3Qgd2lkdGg9IjE4IiBoZWlnaHQ9IjExIiB4PSIzIiB5PSIxMSIgcng9IjIiIHJ5PSIyIiAvPgogIDxwYXRoIGQ9Ik03IDExVjdhNSA1IDAgMCAxIDEwIDB2NCIgLz4KPC9zdmc+Cg==");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-unlock::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtbG9jay1vcGVuIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cmVjdCB3aWR0aD0iMTgiIGhlaWdodD0iMTEiIHg9IjMiIHk9IjExIiByeD0iMiIgcnk9IjIiIC8+CiAgPHBhdGggZD0iTTcgMTFWN2E1IDUgMCAwIDEgOS45LTEiIC8+Cjwvc3ZnPgo=");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtbG9jay1vcGVuIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cmVjdCB3aWR0aD0iMTgiIGhlaWdodD0iMTEiIHg9IjMiIHk9IjExIiByeD0iMiIgcnk9IjIiIC8+CiAgPHBhdGggZD0iTTcgMTFWN2E1IDUgMCAwIDEgOS45LTEiIC8+Cjwvc3ZnPgo=");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) [data-test="removeUser"] .icon-bbb-circle_close::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtdXNlci1yb3VuZC14IgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJNMiAyMWE4IDggMCAwIDEgMTEuODczLTciIC8+CiAgPGNpcmNsZSBjeD0iMTAiIGN5PSI4IiByPSI1IiAvPgogIDxwYXRoIGQ9Im0xNyAxNyA1IDUiIC8+CiAgPHBhdGggZD0ibTIyIDE3LTUgNSIgLz4KPC9zdmc+Cg==");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtdXNlci1yb3VuZC14IgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJNMiAyMWE4IDggMCAwIDEgMTEuODczLTciIC8+CiAgPGNpcmNsZSBjeD0iMTAiIGN5PSI4IiByPSI1IiAvPgogIDxwYXRoIGQ9Im0xNyAxNyA1IDUiIC8+CiAgPHBhdGggZD0ibTIyIDE3LTUgNSIgLz4KPC9zdmc+Cg==");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-template_download::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtZG93bmxvYWQiCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxwYXRoIGQ9Ik0yMSAxNXY0YTIgMiAwIDAgMS0yIDJINWEyIDIgMCAwIDEtMi0ydi00IiAvPgogIDxwb2x5bGluZSBwb2ludHM9IjcgMTAgMTIgMTUgMTcgMTAiIC8+CiAgPGxpbmUgeDE9IjEyIiB4Mj0iMTIiIHkxPSIxNSIgeTI9IjMiIC8+Cjwvc3ZnPgo=");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtZG93bmxvYWQiCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxwYXRoIGQ9Ik0yMSAxNXY0YTIgMiAwIDAgMS0yIDJINWEyIDIgMCAwIDEtMi0ydi00IiAvPgogIDxwb2x5bGluZSBwb2ludHM9IjcgMTAgMTIgMTUgMTcgMTAiIC8+CiAgPGxpbmUgeDE9IjEyIiB4Mj0iMTIiIHkxPSIxNSIgeTI9IjMiIC8+Cjwvc3ZnPgo=");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-search::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtc2VhcmNoIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8Y2lyY2xlIGN4PSIxMSIgY3k9IjExIiByPSI4IiAvPgogIDxwYXRoIGQ9Im0yMSAyMS00LjMtNC4zIiAvPgo8L3N2Zz4K");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtc2VhcmNoIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8Y2lyY2xlIGN4PSIxMSIgY3k9IjExIiByPSI4IiAvPgogIDxwYXRoIGQ9Im0yMSAyMS00LjMtNC4zIiAvPgo8L3N2Zz4K");
+}
+
+/* Other menus */
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-check::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtY2hlY2siCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxwYXRoIGQ9Ik0yMCA2IDkgMTdsLTUtNSIgLz4KPC9zdmc+Cg==");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtY2hlY2siCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxwYXRoIGQ9Ik0yMCA2IDkgMTdsLTUtNSIgLz4KPC9zdmc+Cg==");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-fullscreen::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtbWF4aW1pemUiCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxwYXRoIGQ9Ik04IDNINWEyIDIgMCAwIDAtMiAydjMiIC8+CiAgPHBhdGggZD0iTTIxIDhWNWEyIDIgMCAwIDAtMi0yaC0zIiAvPgogIDxwYXRoIGQ9Ik0zIDE2djNhMiAyIDAgMCAwIDIgMmgzIiAvPgogIDxwYXRoIGQ9Ik0xNiAyMWgzYTIgMiAwIDAgMCAyLTJ2LTMiIC8+Cjwvc3ZnPgo=");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtbWF4aW1pemUiCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxwYXRoIGQ9Ik04IDNINWEyIDIgMCAwIDAtMiAydjMiIC8+CiAgPHBhdGggZD0iTTIxIDhWNWEyIDIgMCAwIDAtMi0yaC0zIiAvPgogIDxwYXRoIGQ9Ik0zIDE2djNhMiAyIDAgMCAwIDIgMmgzIiAvPgogIDxwYXRoIGQ9Ik0xNiAyMWgzYTIgMiAwIDAgMCAyLTJ2LTMiIC8+Cjwvc3ZnPgo=");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-logout::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtbG9nLW91dCIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHBhdGggZD0iTTkgMjFINWEyIDIgMCAwIDEtMi0yVjVhMiAyIDAgMCAxIDItMmg0IiAvPgogIDxwb2x5bGluZSBwb2ludHM9IjE2IDE3IDIxIDEyIDE2IDciIC8+CiAgPGxpbmUgeDE9IjIxIiB4Mj0iOSIgeTE9IjEyIiB5Mj0iMTIiIC8+Cjwvc3ZnPgo=");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtbG9nLW91dCIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHBhdGggZD0iTTkgMjFINWEyIDIgMCAwIDEtMi0yVjVhMiAyIDAgMCAxIDItMmg0IiAvPgogIDxwb2x5bGluZSBwb2ludHM9IjE2IDE3IDIxIDEyIDE2IDciIC8+CiAgPGxpbmUgeDE9IjIxIiB4Mj0iOSIgeTE9IjEyIiB5Mj0iMTIiIC8+Cjwvc3ZnPgo=");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) .icon-bbb-delete::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtdHJhc2gtMiIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHBhdGggZD0iTTMgNmgxOCIgLz4KICA8cGF0aCBkPSJNMTkgNnYxNGMwIDEtMSAyLTIgMkg3Yy0xIDAtMi0xLTItMlY2IiAvPgogIDxwYXRoIGQ9Ik04IDZWNGMwLTEgMS0yIDItMmg0YzEgMCAyIDEgMiAydjIiIC8+CiAgPGxpbmUgeDE9IjEwIiB4Mj0iMTAiIHkxPSIxMSIgeTI9IjE3IiAvPgogIDxsaW5lIHgxPSIxNCIgeDI9IjE0IiB5MT0iMTEiIHkyPSIxNyIgLz4KPC9zdmc+Cg==");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtdHJhc2gtMiIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHBhdGggZD0iTTMgNmgxOCIgLz4KICA8cGF0aCBkPSJNMTkgNnYxNGMwIDEtMSAyLTIgMkg3Yy0xIDAtMi0xLTItMlY2IiAvPgogIDxwYXRoIGQ9Ik04IDZWNGMwLTEgMS0yIDItMmg0YzEgMCAyIDEgMiAydjIiIC8+CiAgPGxpbmUgeDE9IjEwIiB4Mj0iMTAiIHkxPSIxMSIgeTI9IjE3IiAvPgogIDxsaW5lIHgxPSIxNCIgeDI9IjE0IiB5MT0iMTEiIHkyPSIxNyIgLz4KPC9zdmc+Cg==");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) [data-test="endMeetingButton"] .icon-bbb-close::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtcG93ZXIiCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxwYXRoIGQ9Ik0xMiAydjEwIiAvPgogIDxwYXRoIGQ9Ik0xOC40IDYuNmE5IDkgMCAxIDEtMTIuNzcuMDQiIC8+Cjwvc3ZnPgo=");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtcG93ZXIiCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iY3VycmVudENvbG9yIgogIHN0cm9rZS13aWR0aD0iMiIKICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKPgogIDxwYXRoIGQ9Ik0xMiAydjEwIiAvPgogIDxwYXRoIGQ9Ik0xOC40IDYuNmE5IDkgMCAxIDEtMTIuNzcuMDQiIC8+Cjwvc3ZnPgo=");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) [data-test="toolVisibility"] .icon-bbb-close::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtZXllLW9mZiIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHBhdGggZD0iTTEwLjczMyA1LjA3NmExMC43NDQgMTAuNzQ0IDAgMCAxIDExLjIwNSA2LjU3NSAxIDEgMCAwIDEgMCAuNjk2IDEwLjc0NyAxMC43NDcgMCAwIDEtMS40NDQgMi40OSIgLz4KICA8cGF0aCBkPSJNMTQuMDg0IDE0LjE1OGEzIDMgMCAwIDEtNC4yNDItNC4yNDIiIC8+CiAgPHBhdGggZD0iTTE3LjQ3OSAxNy40OTlhMTAuNzUgMTAuNzUgMCAwIDEtMTUuNDE3LTUuMTUxIDEgMSAwIDAgMSAwLS42OTYgMTAuNzUgMTAuNzUgMCAwIDEgNC40NDYtNS4xNDMiIC8+CiAgPHBhdGggZD0ibTIgMiAyMCAyMCIgLz4KPC9zdmc+Cg==");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtZXllLW9mZiIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHBhdGggZD0iTTEwLjczMyA1LjA3NmExMC43NDQgMTAuNzQ0IDAgMCAxIDExLjIwNSA2LjU3NSAxIDEgMCAwIDEgMCAuNjk2IDEwLjc0NyAxMC43NDcgMCAwIDEtMS40NDQgMi40OSIgLz4KICA8cGF0aCBkPSJNMTQuMDg0IDE0LjE1OGEzIDMgMCAwIDEtNC4yNDItNC4yNDIiIC8+CiAgPHBhdGggZD0iTTE3LjQ3OSAxNy40OTlhMTAuNzUgMTAuNzUgMCAwIDEtMTUuNDE3LTUuMTUxIDEgMSAwIDAgMSAwLS42OTYgMTAuNzUgMTAuNzUgMCAwIDEgNC40NDYtNS4xNDMiIC8+CiAgPHBhdGggZD0ibTIgMiAyMCAyMCIgLz4KPC9zdmc+Cg==");
+}
+
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) [data-test="remove-reaction"] .icon-bbb-close::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUteCIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHBhdGggZD0iTTE4IDYgNiAxOCIgLz4KICA8cGF0aCBkPSJtNiA2IDEyIDEyIiAvPgo8L3N2Zz4K");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUteCIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHBhdGggZD0iTTE4IDYgNiAxOCIgLz4KICA8cGF0aCBkPSJtNiA2IDEyIDEyIiAvPgo8L3N2Zz4K");
+}
+
+/* "Capture current slide" is a photo, not a video */
+:is(:where(#ActionsBar):nth-child(n), :where(#layout > div:has(> [data-test="navigationSidebarContainer"])):nth-child(n), :where([data-test="userListPanel"]):nth-child(n), :where([data-test="optionsButton"]):nth-child(n), [role="menu"]) [data-test="presentationSnapshot"] .icon-bbb-video::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtY2FtZXJhIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJNMTQuNSA0aC01TDcgN0g0YTIgMiAwIDAgMC0yIDJ2OWEyIDIgMCAwIDAgMiAyaDE2YTIgMiAwIDAgMCAyLTJWOWEyIDIgMCAwIDAtMi0yaC0zbC0yLjUtM3oiIC8+CiAgPGNpcmNsZSBjeD0iMTIiIGN5PSIxMyIgcj0iMyIgLz4KPC9zdmc+Cg==");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtY2FtZXJhIgogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9ImN1cnJlbnRDb2xvciIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJNMTQuNSA0aC01TDcgN0g0YTIgMiAwIDAgMC0yIDJ2OWEyIDIgMCAwIDAgMiAyaDE2YTIgMiAwIDAgMCAyLTJWOWEyIDIgMCAwIDAtMi0yaC0zbC0yLjUtM3oiIC8+CiAgPGNpcmNsZSBjeD0iMTIiIGN5PSIxMyIgcj0iMyIgLz4KPC9zdmc+Cg==");
+}
+
+/* Top right options: a menu icon instead of the three dots. Same specificity as
+   the rules above, so being last is what makes it win. */
+:where([data-test="optionsButton"]):nth-child(n) .icon-bbb-more::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtbWVudSIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPGxpbmUgeDE9IjQiIHgyPSIyMCIgeTE9IjEyIiB5Mj0iMTIiIC8+CiAgPGxpbmUgeDE9IjQiIHgyPSIyMCIgeTE9IjYiIHkyPSI2IiAvPgogIDxsaW5lIHgxPSI0IiB4Mj0iMjAiIHkxPSIxOCIgeTI9IjE4IiAvPgo8L3N2Zz4K");
+  mask-image: url("data:image/svg+xml;base64,PCEtLSBAbGljZW5zZSBsdWNpZGUtc3RhdGljIHYwLjQ2MC4wIC0gSVNDIC0tPgo8c3ZnCiAgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtbWVudSIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgd2lkdGg9IjI0IgogIGhlaWdodD0iMjQiCiAgdmlld0JveD0iMCAwIDI0IDI0IgogIGZpbGw9Im5vbmUiCiAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPGxpbmUgeDE9IjQiIHgyPSIyMCIgeTE9IjEyIiB5Mj0iMTIiIC8+CiAgPGxpbmUgeDE9IjQiIHgyPSIyMCIgeTE9IjYiIHkyPSI2IiAvPgogIDxsaW5lIHgxPSI0IiB4Mj0iMjAiIHkxPSIxOCIgeTI9IjE4IiAvPgo8L3N2Zz4K");
+}

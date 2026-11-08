@@ -29,6 +29,14 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build-bundle
+      # Until bigbluebutton/bigbluebutton#26415 ships, the stylesheet for 4.0.3
+      # (which has its classes) lives on the bbb-classes-26415 branch
+      - name: Stylesheet for BigBlueButton 4.0.3
+        run: |
+          if git fetch --depth=1 origin bbb-classes-26415; then
+            git worktree add /tmp/bbb-4.0.3 FETCH_HEAD
+            node scripts/css.js --root /tmp/bbb-4.0.3 --version 4.0.3
+          fi
       - name: Package
         run: tar czf "${{ github.event.repository.name }}.tar.gz" --owner=0 --group=0 -C dist .
       - uses: actions/upload-pages-artifact@v3
