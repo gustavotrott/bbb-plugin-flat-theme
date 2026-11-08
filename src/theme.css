@@ -5,9 +5,11 @@
  * action bar) in JS with inline left/top/width/height, so this file only
  * touches padding, color, border, radius and inner sizes.
  *
- * This branch targets a client with the static `bbb-*` classes (block,
- * block__element, block--state). The main branch keeps the data-test and
- * structural selectors that work on the stock client.
+ * Selectors use the client's static `bbb-*` classes (block, block__element,
+ * block--state). This branch needs the classes added by
+ * bigbluebutton/bigbluebutton#26415 (action buttons, menu items, crowd
+ * actions...), so it has no data-test selectors left. Clients without them
+ * use the main branch.
  */
 
 :root {
@@ -220,7 +222,7 @@ body,
   padding: 16px 16px 8px !important;
 }
 
-[data-test="chatReplyIntentionContainer"] {
+.bbb-chat-reply-intention {
   margin: 0 16px;
 }
 
@@ -266,18 +268,18 @@ body,
 }
 
 /* Send: icon only, no filled square */
-[data-test="sendMessageButton"] {
+.bbb-chat-form__send {
   background: transparent !important;
   box-shadow: none !important;
 }
 
-[data-test="sendMessageButton"] svg,
-[data-test="sendMessageButton"] svg * {
+.bbb-chat-form__send svg,
+.bbb-chat-form__send svg * {
   fill: #6b7280 !important;
 }
 
-[data-test="sendMessageButton"]:hover svg,
-[data-test="sendMessageButton"]:hover svg * {
+.bbb-chat-form__send:hover svg,
+.bbb-chat-form__send:hover svg * {
   fill: var(--theme-primary) !important;
 }
 
@@ -477,15 +479,15 @@ div:has(> .bbb-webcam__presenter-badge) {
  * above are more specific and keep their 10px. The small audio device arrow on
  * the microphone stays round, and toggle switches are not buttons.
  */
-button:not([data-test="audioDropdownMenu"]),
+button:not(.bbb-audio-dropdown),
 .bbb-button__icon,
 select,
 textarea,
 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
-[data-test="timeIndicator"],
-[data-test="remove-reaction"],
-div:has(> [data-test="increaseRooms"]),
-:is(.bbb-user-list-item, .bbb-raised-hands__item, [data-test="raisedHandsListItem"]) > div:has(> div[data-test]) {
+.bbb-timer-indicator__button,
+.bbb-menu__item--remove-reaction,
+.bbb-breakout-room-count,
+:is(.bbb-user-list-item, .bbb-raised-hands__item) > .bbb-user-list-item__toolbar {
   border-radius: 8px !important;
 }
 
@@ -590,19 +592,18 @@ div:has(> .bbb-webcam__name) {
 
 /* The header time, and the one the client shows on hover in the bubble's
    corner (system notices and follow-up messages from the same person) */
-.bbb-chat-message__time,
-[data-test="chatMessageFooterTime"] {
+.bbb-chat-message__time {
   font-size: .75rem !important;
   font-style: normal !important;
   color: #8A939E !important;
 }
 
-.bbb-chat-message--system [data-test="chatMessageNotificationContent"] {
+.bbb-chat-message--system .bbb-chat-message__notice {
   display: flex;
   justify-content: center;
 }
 
-.bbb-chat-message--system [data-test="chatMessageNotificationContent"] p {
+.bbb-chat-message--system .bbb-chat-message__notice p {
   display: inline-block !important;
   margin: 0 !important;
   padding: 4px 12px !important;
@@ -628,22 +629,22 @@ div:has(> .bbb-webcam__name) {
 /* [polish:users] User list: soft hover on each person, and the actions
    capsule only gets its gray box on hover, so the list reads calmer */
 /* The raised hands rows at the top reuse the user list item: same look.
-   .bbb-raised-hands__item comes from bigbluebutton/bigbluebutton#26415; data-test covers earlier versions */
-:is(.bbb-user-list-item, .bbb-raised-hands__item, [data-test="raisedHandsListItem"]) {
+   .bbb-raised-hands__item comes from bigbluebutton/bigbluebutton#26415 */
+:is(.bbb-user-list-item, .bbb-raised-hands__item) {
   border-radius: 10px !important;
   transition: background-color .12s ease;
 }
 
-:is(.bbb-user-list-item, .bbb-raised-hands__item, [data-test="raisedHandsListItem"]):hover {
+:is(.bbb-user-list-item, .bbb-raised-hands__item):hover {
   background-color: #F4F6FA !important;
 }
 
-:is(.bbb-user-list-item, .bbb-raised-hands__item, [data-test="raisedHandsListItem"]) > div:has(> div[data-test]) {
+:is(.bbb-user-list-item, .bbb-raised-hands__item) > .bbb-user-list-item__toolbar {
   background: transparent !important;
   transition: background-color .12s ease;
 }
 
-:is(.bbb-user-list-item, .bbb-raised-hands__item, [data-test="raisedHandsListItem"]):hover > div:has(> div[data-test]) {
+:is(.bbb-user-list-item, .bbb-raised-hands__item):hover > .bbb-user-list-item__toolbar {
   background: #E9EDF3 !important;
 }
 
@@ -661,11 +662,11 @@ div:has(> .bbb-webcam__name) {
 /* [polish:footer] "Mute all" and "Lock viewers": one button each, icon and
    text together, instead of a caption over a big gray box. The real button
    stretches over the whole box (::after), so the whole box is clickable. */
-.bbb-user-list > div:last-child:has(> div > [data-test="muteAllUsers"], > div > [data-test="lockViewersButton"]) {
+.bbb-crowd-actions {
   gap: 8px;
 }
 
-.bbb-user-list > div:last-child > div:has(> [data-test="muteAllUsers"], > [data-test="lockViewersButton"]) {
+.bbb-crowd-actions__item {
   position: relative;
   display: flex !important;
   flex-direction: row-reverse !important;
@@ -682,12 +683,12 @@ div:has(> .bbb-webcam__name) {
   transition: background-color .12s ease, border-color .12s ease;
 }
 
-.bbb-user-list > div:last-child > div:has(> [data-test="muteAllUsers"], > [data-test="lockViewersButton"]):hover {
+.bbb-crowd-actions__item:hover {
   border-color: #C5CDD8;
   background: #F4F6FA;
 }
 
-.bbb-user-list > div:last-child > div > span {
+.bbb-crowd-actions__label {
   margin: 0 !important;
   overflow: hidden;
   white-space: nowrap;
@@ -697,7 +698,7 @@ div:has(> .bbb-webcam__name) {
   color: var(--theme-text) !important;
 }
 
-.bbb-user-list > div:last-child > div > :is([data-test="muteAllUsers"], [data-test="lockViewersButton"]) {
+.bbb-crowd-actions__item > button {
   position: static !important;
   flex: 0 0 auto;
   width: auto !important;
@@ -710,7 +711,7 @@ div:has(> .bbb-webcam__name) {
   box-shadow: none !important;
 }
 
-.bbb-user-list > div:last-child > div > :is([data-test="muteAllUsers"], [data-test="lockViewersButton"])::after {
+.bbb-crowd-actions__item > button::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -822,8 +823,8 @@ div:has(> .bbb-webcam__name) {
   .icon-bbb-delete,
   .icon-bbb-template_download,
   .icon-bbb-search,
-  [data-test="removeUser"] .icon-bbb-circle_close,
-  :is([data-test="endMeetingButton"], [data-test="toolVisibility"], [data-test="remove-reaction"]) .icon-bbb-close
+  .bbb-menu__item--remove-user .icon-bbb-circle_close,
+  :is(.bbb-menu__item--end-meeting, .bbb-menu__item--toolbar-visibility, .bbb-menu__item--remove-reaction) .icon-bbb-close
 )::before {
   content: "" !important;
   display: block;
@@ -993,7 +994,7 @@ div:has(> .bbb-webcam__name) {
   mask-image: url(./icons/lock-open.svg);
 }
 
-:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) [data-test="removeUser"] .icon-bbb-circle_close::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .bbb-menu__item--remove-user .icon-bbb-circle_close::before {
   -webkit-mask-image: url(./icons/user-round-x.svg);
   mask-image: url(./icons/user-round-x.svg);
 }
@@ -1029,23 +1030,23 @@ div:has(> .bbb-webcam__name) {
   mask-image: url(./icons/trash-2.svg);
 }
 
-:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) [data-test="endMeetingButton"] .icon-bbb-close::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .bbb-menu__item--end-meeting .icon-bbb-close::before {
   -webkit-mask-image: url(./icons/power.svg);
   mask-image: url(./icons/power.svg);
 }
 
-:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) [data-test="toolVisibility"] .icon-bbb-close::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .bbb-menu__item--toolbar-visibility .icon-bbb-close::before {
   -webkit-mask-image: url(./icons/eye-off.svg);
   mask-image: url(./icons/eye-off.svg);
 }
 
-:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) [data-test="remove-reaction"] .icon-bbb-close::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .bbb-menu__item--remove-reaction .icon-bbb-close::before {
   -webkit-mask-image: url(./icons/x.svg);
   mask-image: url(./icons/x.svg);
 }
 
 /* "Capture current slide" is a photo, not a video */
-:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) [data-test="presentationSnapshot"] .icon-bbb-video::before {
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .bbb-menu__item--snapshot .icon-bbb-video::before {
   -webkit-mask-image: url(./icons/camera.svg);
   mask-image: url(./icons/camera.svg);
 }
