@@ -1,6 +1,9 @@
 # bbb-plugin-flat-theme
 
-A theme plugin for the BigBlueButton 4.0 HTML5 client. It is pure CSS shipped as a plugin: no client rebuild, no `customStyleUrl`, no extra files to host besides the plugin itself.
+A theme plugin for the BigBlueButton 4.0 HTML5 client. It is pure CSS, so you can use it in two ways:
+
+- **As a plugin** (`pluginManifests`): no client rebuild and nothing else to configure.
+- **As a plain stylesheet** (`customStyleUrl`): one static `theme.css` with every icon inlined, if you would rather not run a plugin. See [Use it as a custom style](#use-it-as-a-custom-style-css-only).
 
 > **Requires BigBlueButton 4.0.1 or later.** The theme styles the client through its static `bbb-*` classes (`bbb-avatar--presenter`, `bbb-navigation__item--active`...), added in 4.0.1 ([#26193](https://github.com/bigbluebutton/bigbluebutton/pull/26193)). For 4.0.0, use the [`bbb-4.0.0`](https://github.com/gustavotrott/bbb-plugin-flat-theme/tree/bbb-4.0.0) branch, which styles it through `data-test` attributes and the DOM structure.
 
@@ -112,6 +115,40 @@ You can skip the download and put the GitHub Pages manifest (`https://gustavotro
 
 If you used a `customStyleUrl` before, remove it from `/etc/bigbluebutton/bbb-html5.yml` and restart `bbb-apps-akka` as well: the client settings are stored per meeting by akka-apps, which only reads that file on startup.
 
+## Use it as a custom style (CSS only)
+
+The build also writes `dist/theme.css`: the same theme as one static stylesheet, with the icons inlined as data URIs. The client adds it as a `<link rel="stylesheet">`, so nothing runs besides the CSS. Use the plugin or the stylesheet, not both.
+
+The stylesheet is on GitHub Pages at `https://gustavotrott.github.io/bbb-plugin-flat-theme/theme.css`, and every release attaches it as `theme.css`.
+
+**For one user**, pass it on the `join` call:
+
+```text
+userdata-bbb_custom_style_url=https://gustavotrott.github.io/bbb-plugin-flat-theme/theme.css
+```
+
+**For the whole server**, host it yourself (or use the GitHub Pages URL):
+
+1. Download it into a folder served by nginx:
+
+   ```bash
+   sudo mkdir -p /var/www/bigbluebutton-default/assets/plugins/bbb-plugin-flat-theme
+   sudo curl -fsSL -o /var/www/bigbluebutton-default/assets/plugins/bbb-plugin-flat-theme/theme.css \
+     https://github.com/gustavotrott/bbb-plugin-flat-theme/releases/latest/download/theme.css
+   ```
+
+2. Set `public.app.customStyleUrl` in `/etc/bigbluebutton/bbb-html5.yml`:
+
+   ```yaml
+   public:
+     app:
+       customStyleUrl: https://<your-server>/plugins/bbb-plugin-flat-theme/theme.css
+   ```
+
+3. Restart BigBlueButton (`sudo bbb-conf --restart`). The client settings are stored per meeting by akka-apps, which only reads `bbb-html5.yml` on startup.
+
+Meetings created from then on load the stylesheet. To update, run step 1 again.
+
 ## Build from source
 
 ```bash
@@ -121,7 +158,7 @@ sudo mkdir -p /var/www/bigbluebutton-default/assets/plugins/bbb-plugin-flat-them
 sudo cp dist/* /var/www/bigbluebutton-default/assets/plugins/bbb-plugin-flat-theme/
 ```
 
-Then follow steps 2 and 3 above.
+Then follow steps 2 and 3 of [Install on your server](#install-on-your-server). `npm run build-bundle` also writes `dist/theme.css`; `npm run build-css` writes only that file.
 
 ## Customizing
 
@@ -156,7 +193,7 @@ The theme targets the client's light mode. On the test server, turning on the cl
 
 ## Releases
 
-Every push to `main` publishes `dist/` on GitHub Pages. Pushing a `v*` tag, with the same version as `package.json` and `manifest.json`, builds the plugin and attaches `bbb-plugin-flat-theme.tar.gz` to a GitHub release.
+Every push to `main` publishes `dist/` (plugin and `theme.css`) on GitHub Pages. Pushing a `v*` tag, with the same version as `package.json` and `manifest.json`, builds the plugin and attaches `bbb-plugin-flat-theme.tar.gz` and `theme.css` to a GitHub release.
 
 ## More themes
 

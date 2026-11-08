@@ -6,7 +6,8 @@
   "license": "MIT",
   "main": "./src/index.tsx",
   "scripts": {
-    "build-bundle": "webpack --mode production",
+    "build-bundle": "webpack --mode production && node scripts/css.js",
+    "build-css": "node scripts/css.js",
     "start": "webpack serve --mode development"
   },
   "dependencies": {
