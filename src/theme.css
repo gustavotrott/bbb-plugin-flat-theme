@@ -98,6 +98,31 @@ body,
   font-weight: 600 !important;
 }
 
+/*
+ * The client spreads the three groups of icons over the whole height of the
+ * bar, with wide gaps inside each one, so a handful of icons filled it. On
+ * screens with a mouse the groups sit together at the top, close to each
+ * other, and only the last one (dashboard, settings) stays at the bottom.
+ */
+@media (pointer: fine) and (min-width: 768px) {
+  .bbb-navigation__list {
+    justify-content: flex-start !important;
+    gap: 10px !important;
+  }
+
+  .bbb-navigation__list > div {
+    gap: 0 !important;
+  }
+
+  .bbb-navigation__list > div:last-child {
+    margin-top: auto;
+  }
+
+  .bbb-navigation__list > hr:last-of-type {
+    display: none;
+  }
+}
+
 .bbb-navigation__separator {
   border-color: rgba(255, 255, 255, .15) !important;
   background: rgba(255, 255, 255, .15) !important;
@@ -109,7 +134,7 @@ body,
  */
 .bbb-navigation__bar {
   container-type: inline-size;
-  --theme-nav-button: min(48px, calc(100cqw - 8px));
+  --theme-nav-button: min(44px, calc(100cqw - 8px));
 }
 
 /*
@@ -146,7 +171,7 @@ body,
 
 .bbb-navigation__item i {
   color: #fff !important;
-  font-size: 22px !important;
+  font-size: 24px !important;
 }
 
 .bbb-navigation__item:hover {
@@ -248,21 +273,43 @@ body,
   background: #fff;
 }
 
+/*
+ * A one-line field with the send button beside it, instead of a 61px box with
+ * the button inside. The client still sizes the textarea to its content, so
+ * the field grows line by line as you type (up to the client's 100px).
+ */
 .bbb-chat-form__input {
-  border: 1px solid #D5D8DD !important;
-  border-radius: 8px !important;
+  align-items: flex-end !important;
+  gap: 6px;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
   box-shadow: none !important;
 }
 
-/* Focus highlights the whole input box, not just the textarea inside it */
-.bbb-chat-form__input:focus-within {
-  border-color: var(--theme-primary) !important;
-  box-shadow: 0 0 0 3px rgba(15, 112, 215, .18) !important;
+#message-input {
+  box-sizing: border-box !important;
+  min-height: 40px;
+  padding: 9px 12px !important;
+  border: 1px solid #D5D8DD !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  transition: border-color .12s ease, box-shadow .12s ease;
 }
 
 #message-input:focus,
 #message-input:focus-visible {
   outline: none !important;
+  border-color: var(--theme-primary) !important;
+  box-shadow: 0 0 0 3px rgba(15, 112, 215, .18) !important;
+}
+
+.bbb-chat-form__input > div:has([data-test="sendMessageButton"]),
+[data-test="sendMessageButton"] {
+  flex: 0 0 auto;
+  height: 40px !important;
 }
 
 /*
@@ -288,14 +335,24 @@ body,
   box-shadow: none !important;
 }
 
-.bbb-chat-form__send svg,
-.bbb-chat-form__send svg * {
-  fill: #6b7280 !important;
+/* An outline paper plane instead of the client's filled one */
+.bbb-chat-form__send svg {
+  display: none !important;
 }
 
-.bbb-chat-form__send:hover svg,
-.bbb-chat-form__send:hover svg * {
-  fill: var(--theme-primary) !important;
+.bbb-chat-form__send::before {
+  content: "";
+  display: block;
+  width: 22px;
+  height: 22px;
+  background-color: #6b7280;
+  -webkit-mask: url(./icons/send.svg) center / contain no-repeat;
+  mask: url(./icons/send.svg) center / contain no-repeat;
+  transition: background-color .12s ease;
+}
+
+.bbb-chat-form__send:hover::before {
+  background-color: var(--theme-primary);
 }
 
 /* Thin, quiet scrollbars in the panels */
@@ -769,13 +826,6 @@ body,
   transition: background-color .12s ease;
 }
 
-/* Some of them came with a gray tile and others without: none at rest. A
-   button that is on (multi-user whiteboard) keeps its blue. */
-.bbb-presentation-toolbar .bbb-button:not(.bbb-button--primary),
-.bbb-presentation-toolbar .bbb-button:not(.bbb-button--primary) > .bbb-button__icon {
-  background: transparent !important;
-}
-
 .bbb-presentation-toolbar .bbb-button--primary > .bbb-button__icon {
   color: #fff !important;
 }
@@ -785,24 +835,68 @@ body,
   color: inherit !important;
 }
 
-.bbb-presentation-toolbar .bbb-button:hover > .bbb-button__icon {
-  background: #E6EBF2 !important;
-}
-
-.bbb-presentation-toolbar .bbb-button[aria-disabled="true"] > .bbb-button__icon {
+.bbb-presentation-toolbar .bbb-button[aria-disabled="true"] > .bbb-button__icon > i {
   opacity: .35;
-  background: transparent !important;
 }
 
 .bbb-presentation-toolbar select {
-  font-weight: 600 !important;
+  font-weight: 400 !important;
   color: var(--theme-text) !important;
-  background-color: transparent !important;
   transition: background-color .12s ease;
 }
 
-.bbb-presentation-toolbar select:hover {
-  background-color: #E6EBF2 !important;
+/*
+ * Light gray tiles on the white bar. Previous, the slide picker and next are
+ * one segmented control, and so are zoom out, the zoom level and zoom in.
+ */
+.bbb-presentation-toolbar {
+  --toolbar-tile: #F1F4F8;
+  --toolbar-tile-hover: #E3E8EF;
+  align-items: center;
+  padding: 4px 8px !important;
+}
+
+.bbb-presentation-toolbar .bbb-button:not(.bbb-button--primary) > .bbb-button__icon,
+.bbb-presentation-toolbar select,
+.bbb-presentation-toolbar [data-test="resetZoomButton"] {
+  height: 32px !important;
+  box-sizing: border-box !important;
+  border: 0 !important;
+  background: var(--toolbar-tile) !important;
+}
+
+.bbb-presentation-toolbar .bbb-button--circle > .bbb-button__icon {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 34px !important;
+  padding: 0 !important;
+}
+
+.bbb-presentation-toolbar .bbb-button:not(.bbb-button--primary):hover > .bbb-button__icon,
+.bbb-presentation-toolbar select:hover,
+.bbb-presentation-toolbar [data-test="resetZoomButton"]:hover {
+  background: var(--toolbar-tile-hover) !important;
+}
+
+.bbb-presentation-toolbar__slide-controls {
+  gap: 1px;
+}
+
+.bbb-presentation-toolbar [data-test="prevSlide"] > .bbb-button__icon,
+.bbb-presentation-toolbar [data-test="zoomOutBtn"] > .bbb-button__icon {
+  border-radius: 8px 0 0 8px !important;
+}
+
+.bbb-presentation-toolbar [data-test="nextSlide"] > .bbb-button__icon,
+.bbb-presentation-toolbar [data-test="zoomInBtn"] > .bbb-button__icon {
+  border-radius: 0 8px 8px 0 !important;
+}
+
+.bbb-presentation-toolbar__slide-controls select,
+.bbb-presentation-toolbar [data-test="resetZoomButton"] {
+  margin: 0 1px !important;
+  border-radius: 0 !important;
 }
 
 /* The stage already rounds the corners */
@@ -999,7 +1093,23 @@ div:has(> .bbb-webcam__name) {
 }
 
 .bbb-chat-message .chat-message-content {
-  border-radius: 12px !important;
+  border-radius: 10px !important;
+}
+
+/* A speech bubble: on the first message of each person, the corner next to
+   the name is almost square. The ones that follow are round all over. */
+.bbb-chat-message:has(.bbb-chat-message__name) .chat-message-content {
+  border-radius: 2px 10px 10px 10px !important;
+}
+
+/* Messages in a row from the same person sit closer together */
+.bbb-chat-message:not(.bbb-chat-message--system):not(:has(.bbb-chat-message__name)) {
+  margin-top: 5px !important;
+}
+
+.bbb-chat-message:not(.bbb-chat-message--system) [data-test="chatMessageContent"] {
+  padding: 11px 16px !important;
+  line-height: 1.45;
 }
 
 /* Your own messages in a light blue, so the two sides of a conversation differ */
@@ -1013,6 +1123,88 @@ div:has(> .bbb-webcam__name) {
 
 .bbb-chat-message__name {
   font-weight: 600 !important;
+}
+
+/* The time sits right after the name, not on the far side of the row */
+.bbb-chat-message__name + div:empty {
+  display: none !important;
+}
+
+.bbb-chat-message:not(.bbb-chat-message--system) .chat-message-content {
+  transition: box-shadow .12s ease;
+}
+
+.bbb-chat-message:not(.bbb-chat-message--system) .chat-message-content:hover {
+  box-shadow: inset 0 0 0 1px rgba(15, 112, 215, .45);
+}
+
+/*
+ * Pinned message: a card with room around it and a soft shadow, instead of a
+ * full-width block glued to the header, and text the size of the messages.
+ */
+.bbb-chat div:has(> div:first-child > div > .icon-bbb-pin_filled) {
+  width: calc(100% - 32px) !important;
+  box-sizing: border-box !important;
+  margin: 12px 16px 4px !important;
+  padding: 14px 16px !important;
+  border: 1px solid var(--theme-line) !important;
+  border-radius: var(--theme-radius) !important;
+  box-shadow: 0 2px 10px rgba(16, 33, 51, .08) !important;
+}
+
+.bbb-chat div:has(> div:first-child > div > .icon-bbb-pin_filled) > div:nth-child(2),
+.bbb-chat div:has(> div:first-child > div > .icon-bbb-pin_filled) > div:nth-child(2) * {
+  font-size: 15px !important;
+  line-height: 1.45 !important;
+  color: #4E5A66 !important;
+}
+
+/*
+ * [polish:reactions] Reactions under a message: room above and below (they
+ * were squeezed between two bubbles), a softer border, a smaller bold count,
+ * and they wrap instead of leaving the panel. Which ones are yours is still
+ * told by the client's own background, the only place that state lives.
+ */
+.bbb-chat-message div:has(> [data-test="messageReactionItem"]) {
+  flex-wrap: wrap;
+  gap: 6px !important;
+  margin: 6px 0 4px !important;
+}
+
+[data-test="messageReactionItem"] {
+  align-items: center;
+  height: 26px;
+  padding: 0 9px !important;
+  border-color: #D5DBE3 !important;
+  transition: border-color .12s ease;
+}
+
+[data-test="messageReactionItem"]:hover {
+  border-color: var(--theme-primary) !important;
+}
+
+[data-test="messageReactionItem"] em-emoji {
+  margin-right: 5px !important;
+  font-size: 15px;
+}
+
+[data-test="messageReactionItem"] > span:not(.sr-only) {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4E5A66;
+}
+
+/* Emoji picker: the same rounded card as the menus, with the theme accent */
+.MuiPopover-paper:has(em-emoji-picker) {
+  border-radius: 12px !important;
+  box-shadow: 0 12px 32px rgba(16, 33, 51, .18), 0 0 0 1px rgba(16, 33, 51, .06) !important;
+}
+
+em-emoji-picker {
+  --rgb-accent: 15, 112, 215;
+  --font-family: inherit;
+  --border-radius: 12px;
+  --shadow: none;
 }
 
 /* The header time, and the one the client shows on hover in the bubble's
@@ -1163,9 +1355,10 @@ div:has(> .bbb-webcam__name) {
   background-color: var(--theme-danger) !important;
 }
 
-/* [polish:panel] Panel titles a touch bolder, like app section headers */
+/* [polish:panel] Panel titles in regular weight, a little larger */
 .bbb-panel-header__title {
-  font-weight: 600 !important;
+  font-size: 1.3rem !important;
+  font-weight: 400 !important;
   letter-spacing: -.01em;
 }
 
@@ -1461,6 +1654,62 @@ div:has(> .bbb-webcam__name) {
 :is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-settings::before {
   -webkit-mask-image: url(./icons/settings.svg);
   mask-image: url(./icons/settings.svg);
+}
+
+/*
+ * Icon bar: the same icons in a thinner stroke (1.25 instead of 2). White on
+ * the dark bar and at 24px they read lighter that way, while the action bar,
+ * the menus and the user list keep the regular weight, where the icons are
+ * smaller and sit on light tiles.
+ */
+.bbb-navigation .bbb-navigation__item .icon-bbb-profile::before {
+  -webkit-mask-image: url(./icons/thin/user-round-cog.svg);
+  mask-image: url(./icons/thin/user-round-cog.svg);
+}
+
+.bbb-navigation .bbb-navigation__item .icon-bbb-user_list::before {
+  -webkit-mask-image: url(./icons/thin/users.svg);
+  mask-image: url(./icons/thin/users.svg);
+}
+
+.bbb-navigation .bbb-navigation__item .icon-bbb-group_chat::before {
+  -webkit-mask-image: url(./icons/thin/messages-square.svg);
+  mask-image: url(./icons/thin/messages-square.svg);
+}
+
+.bbb-navigation .bbb-navigation__item .icon-bbb-shared_notes::before {
+  -webkit-mask-image: url(./icons/thin/notebook-pen.svg);
+  mask-image: url(./icons/thin/notebook-pen.svg);
+}
+
+.bbb-navigation .bbb-navigation__item .icon-bbb-widgets::before {
+  -webkit-mask-image: url(./icons/thin/layout-grid.svg);
+  mask-image: url(./icons/thin/layout-grid.svg);
+}
+
+.bbb-navigation .bbb-navigation__item .icon-bbb-rooms::before {
+  -webkit-mask-image: url(./icons/thin/door-open.svg);
+  mask-image: url(./icons/thin/door-open.svg);
+}
+
+.bbb-navigation .bbb-navigation__item .icon-bbb-polling::before {
+  -webkit-mask-image: url(./icons/thin/chart-column.svg);
+  mask-image: url(./icons/thin/chart-column.svg);
+}
+
+.bbb-navigation .bbb-navigation__item .icon-bbb-time::before {
+  -webkit-mask-image: url(./icons/thin/timer.svg);
+  mask-image: url(./icons/thin/timer.svg);
+}
+
+.bbb-navigation .bbb-navigation__item .icon-bbb-learning_dashboard::before {
+  -webkit-mask-image: url(./icons/thin/chart-no-axes-combined.svg);
+  mask-image: url(./icons/thin/chart-no-axes-combined.svg);
+}
+
+.bbb-navigation .bbb-navigation__item .icon-bbb-settings::before {
+  -webkit-mask-image: url(./icons/thin/settings.svg);
+  mask-image: url(./icons/thin/settings.svg);
 }
 
 /* User list and its menu */

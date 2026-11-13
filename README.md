@@ -29,14 +29,15 @@ _Camera images in the screenshots are illustrations._
 **Icon bar (left)**
 - Full height, no padding and no rounded corners, on a solid blue background.
 - Narrower: 72px instead of the client's `60px + 2% of the window`.
-- 48px buttons with white icons. The active item gets a lighter background and a marker on the right edge.
+- 44px buttons with white 24px icons in a thin stroke (1.25 instead of the 2 used everywhere else). The active item gets a lighter background and a marker on the right edge.
+- On desktop the groups of icons sit together at the top, about 52px apart, instead of being spread over the whole height. Only the last group (dashboard, settings) stays at the bottom.
 - The logo (when there is one) sits on a white tile, so any logo reads well on the dark bar.
 - On phones, where the client overlays a 48px bar, buttons shrink to 40px and the list scrolls only vertically, with the scroll shadow drawn in the bar color.
 
 **Sidebar panel (chat, users, notes...)**
 - Flush with the icon bar and full height: no padding, no rounded corners, no shadow.
-- 64px header with a bottom line, title in regular case.
-- Chat input pinned to the bottom, with a thin border. The send button is just the icon.
+- 64px header with a bottom line, title in regular case and regular weight.
+- Chat input pinned to the bottom: a one-line field that grows as you type, with an outline paper plane beside it.
 
 **Action bar**
 - 40px buttons (the size Meet uses) with 10px corners and 20px icons, the same shape as the icon bar buttons. Active buttons (microphone on, hand raised...) are blue with a white icon.
@@ -65,7 +66,7 @@ _Camera images in the screenshots are illustrations._
 **Presentation and notifications**
 - The presentation area uses 10px corners, like the cameras and the action bar.
 - On a short and wide window (or with a portrait page) the slide leaves empty space beside it, and the slide toolbar was as narrow as the slide, or wider. The block that holds both is now a darker "stage", like the bars of a video player, with the toolbar across its full width, so it reads as one presentation area (`--theme-stage`).
-- The slide toolbar is white, with darker 18px icons (Lucide chevrons, minus and plus), a soft hover, faded disabled buttons and the slide picker in bold.
+- The slide toolbar is white, with light gray tiles and darker 18px icons (Lucide chevrons, minus and plus). Previous, the slide picker and next are one segmented control, and so are the zoom buttons. Disabled buttons fade.
 - Notifications use 8px corners, a soft shadow and the client's font instead of Arial.
 
 **Menus and modals**
@@ -78,6 +79,9 @@ _Camera images in the screenshots are illustrations._
 
 **Chat**
 - Your own messages are light blue and the others gray.
+- The time sits right after the name. The first message of each person is a speech bubble, with an almost square corner next to the name, and the ones that follow are round and closer together. A thin blue border shows on hover.
+- The pinned message is a card with room around it and a soft shadow, with text the size of the messages.
+- Reactions under a message get room above and below, a softer border and a smaller bold count, and they wrap. The emoji picker is a rounded card with the theme accent.
 
 **Camera pages**
 - The page buttons beside the camera grid are translucent instead of solid blue, and the arrows of the page bar on phones are 16px chevrons.
