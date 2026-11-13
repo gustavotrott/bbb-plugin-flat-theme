@@ -123,6 +123,81 @@ body,
   }
 }
 
+/*
+ * A short name under each icon, like Slack, so nobody has to hover to learn
+ * what an icon opens. The names are short on purpose (the full ones are still
+ * in the tooltip): English by default, Portuguese and Spanish by the page
+ * language. An item this list does not know (one added by a plugin) shows its
+ * own label, cut with an ellipsis. Only on screens with a mouse: the bar on
+ * phones is too narrow for text.
+ */
+@media (pointer: fine) and (min-width: 768px) {
+  .bbb-navigation .bbb-navigation__item {
+    margin-bottom: 22px !important;
+  }
+
+  .bbb-navigation__item::before {
+    content: attr(aria-label);
+    position: absolute;
+    top: calc(100% + 3px);
+    left: 50%;
+    width: calc(100cqw - 6px);
+    transform: translateX(-50%);
+    overflow: hidden;
+    font-size: 10.5px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: .01em;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: rgba(255, 255, 255, .85);
+    pointer-events: none;
+  }
+
+  .bbb-navigation__item[data-test="profileSidebarButton"]::before { content: "Profile"; }
+  .bbb-navigation__item[data-test="usersListSidebarButton"]::before { content: "People"; }
+  .bbb-navigation__item[data-test="messagesSidebarButton"]::before { content: "Chat"; }
+  .bbb-navigation__item[data-test="sharedNotesSidebarButton"]::before { content: "Notes"; }
+  .bbb-navigation__item[data-test="appsGallerySidebarButton"]::before { content: "Apps"; }
+  .bbb-navigation__item[data-test="pollSidebarButton"]::before { content: "Polls"; }
+  .bbb-navigation__item[data-test="timerSidebarButton"]::before { content: "Timer"; }
+  .bbb-navigation__item[data-test="learningDashboardSidebarButton"]::before { content: "Reports"; }
+  .bbb-navigation__item[data-test="settingsSidebarButton"]::before { content: "Settings"; }
+  .bbb-navigation__item:has(.icon-bbb-rooms)::before { content: "Rooms"; }
+
+  .bbb-navigation__item[data-test="profileSidebarButton"]:lang(pt)::before { content: "Perfil"; }
+  .bbb-navigation__item[data-test="usersListSidebarButton"]:lang(pt)::before { content: "Pessoas"; }
+  .bbb-navigation__item[data-test="messagesSidebarButton"]:lang(pt)::before { content: "Chat"; }
+  .bbb-navigation__item[data-test="sharedNotesSidebarButton"]:lang(pt)::before { content: "Notas"; }
+  .bbb-navigation__item[data-test="appsGallerySidebarButton"]:lang(pt)::before { content: "Apps"; }
+  .bbb-navigation__item[data-test="pollSidebarButton"]:lang(pt)::before { content: "Enquetes"; }
+  .bbb-navigation__item[data-test="timerSidebarButton"]:lang(pt)::before { content: "Timer"; }
+  .bbb-navigation__item[data-test="learningDashboardSidebarButton"]:lang(pt)::before { content: "Relatórios"; }
+  .bbb-navigation__item[data-test="settingsSidebarButton"]:lang(pt)::before { content: "Ajustes"; }
+  .bbb-navigation__item:has(.icon-bbb-rooms):lang(pt)::before { content: "Salas"; }
+
+  .bbb-navigation__item[data-test="profileSidebarButton"]:lang(es)::before { content: "Perfil"; }
+  .bbb-navigation__item[data-test="usersListSidebarButton"]:lang(es)::before { content: "Personas"; }
+  .bbb-navigation__item[data-test="messagesSidebarButton"]:lang(es)::before { content: "Chat"; }
+  .bbb-navigation__item[data-test="sharedNotesSidebarButton"]:lang(es)::before { content: "Notas"; }
+  .bbb-navigation__item[data-test="appsGallerySidebarButton"]:lang(es)::before { content: "Apps"; }
+  .bbb-navigation__item[data-test="pollSidebarButton"]:lang(es)::before { content: "Encuestas"; }
+  .bbb-navigation__item[data-test="timerSidebarButton"]:lang(es)::before { content: "Timer"; }
+  .bbb-navigation__item[data-test="learningDashboardSidebarButton"]:lang(es)::before { content: "Informes"; }
+  .bbb-navigation__item[data-test="settingsSidebarButton"]:lang(es)::before { content: "Ajustes"; }
+  .bbb-navigation__item:has(.icon-bbb-rooms):lang(es)::before { content: "Salas"; }
+}
+
+/* The icon grows a little under the pointer */
+.bbb-navigation__item i {
+  transition: transform .15s ease;
+}
+
+.bbb-navigation__item:hover i {
+  transform: scale(1.12);
+}
+
 .bbb-navigation__separator {
   border-color: rgba(255, 255, 255, .15) !important;
   background: rgba(255, 255, 255, .15) !important;
