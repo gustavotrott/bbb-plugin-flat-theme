@@ -22,6 +22,10 @@
   --theme-line: #E3E4E8;
   --theme-text: #1f2329;
   --theme-talking: #22C55E;
+  /* Empty space around the slide, inside the presentation area */
+  --theme-stage: #0A1622;
+  /* Behind the modals: the client uses 75% black */
+  --color-overlay: rgba(10, 22, 34, .6);
   /* Icon bar width. The client computes 60px + 2% of the window in JS */
   --theme-nav-width: 72px;
   --theme-nav-excess: calc(60px + 2vw - var(--theme-nav-width));
@@ -81,6 +85,17 @@ body,
   object-fit: contain;
   background: #fff;
   border-radius: 8px;
+}
+
+/* On phones the bar is 48px wide: the tile shrinks with it */
+.bbb-navigation__logo img {
+  max-width: calc(100% - 8px);
+}
+
+/* User count under the users icon: it was a faint gray on the blue bar */
+.bbb-navigation__item > div:last-child:not(:first-child) {
+  color: rgba(255, 255, 255, .85) !important;
+  font-weight: 600 !important;
 }
 
 .bbb-navigation__separator {
@@ -419,11 +434,380 @@ body,
   color: var(--theme-danger) !important;
 }
 
+/* ---------- Media area panel (screen share, slides, video...) ----------
+ * The panel has no static classes: it goes by its id, the data-test of its
+ * parts and its structure (a header, then a scrolling body).
+ * It is a child of the action bar, so the action bar rules above reach the
+ * buttons inside it and are undone here.
+ */
+#mediaAreaDropUp {
+  /* Grows with the window (540px on a laptop, up to 720px on a large
+     monitor) and never gets wider than a phone screen */
+  width: min(calc(100vw - 48px), clamp(540px, 40vw, 720px)) !important;
+  /* dvh: on phones 100vh is taller than what the browser bars leave visible */
+  max-height: calc(100vh - 80px);
+  max-height: calc(100dvh - 80px);
+  overflow: hidden;
+  border-radius: 14px !important;
+  box-shadow: 0 16px 48px rgba(16, 33, 51, .30), 0 0 0 1px rgba(16, 33, 51, .06) !important;
+}
+
+/* Header: same title as the sidebar panels, in regular case. Whoever is not
+   the presenter gets a single block with no header ("Request presenter"). */
+#mediaAreaDropUp > div:first-child:has(> h2) {
+  flex: 0 0 auto;
+  min-height: 56px;
+  box-sizing: border-box;
+  padding: 8px 12px 8px 20px !important;
+  border-bottom: 1px solid var(--theme-line) !important;
+}
+
+#mediaAreaDropUp > div:first-child h2 {
+  text-transform: none !important;
+  font-size: 1.2rem !important;
+  font-weight: 600 !important;
+  letter-spacing: -.01em;
+  color: var(--theme-text) !important;
+}
+
+/* Whoever is not the presenter only gets a line of text and one button
+   ("Take presenter"): a compact card, not a 540px one with a button as wide */
+#mediaAreaDropUp:not(:has(> div > h2)) {
+  width: min(320px, calc(100vw - 48px)) !important;
+}
+
+#mediaAreaDropUp > div:nth-child(2) {
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: #C5CBD3 transparent;
+}
+
+/* Options: four wide tiles per row instead of 63px squares, so every label
+   fits ("Share camera as content" was cut) */
+#mediaAreaDropUp > div:nth-child(2) > div:has(> div > button:first-child + div:last-child) {
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)) !important;
+  gap: 20px 12px !important;
+  padding: 20px !important;
+}
+
+#mediaAreaDropUp > div:nth-child(2) > div > div:has(> button:first-child + div:last-child) {
+  width: 100% !important;
+  min-width: 0;
+  gap: 10px !important;
+}
+
+#mediaAreaDropUp > div:nth-child(2) > div > div > button:first-child:has(+ div:last-child) {
+  width: 100% !important;
+  height: 76px !important;
+  border: 0 !important;
+  border-radius: 12px !important;
+  box-shadow: inset 0 0 0 1px rgba(16, 33, 51, .08);
+  transition: box-shadow .12s ease, transform .12s ease;
+}
+
+#mediaAreaDropUp > div:nth-child(2) > div > div > button:first-child:has(+ div:last-child):hover {
+  box-shadow: inset 0 0 0 1.5px var(--theme-primary);
+}
+
+#mediaAreaDropUp > div:nth-child(2) > div > div > button:first-child:has(+ div:last-child):active {
+  transform: scale(.97);
+}
+
+#mediaAreaDropUp > div:nth-child(2) > div > div > button:first-child + div:last-child {
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3 !important;
+  width: 100% !important;
+  max-height: none !important;
+  font-size: 13px !important;
+  font-weight: 500;
+  line-height: 1.3 !important;
+  color: var(--theme-text) !important;
+}
+
+/* Slides: back button, title */
+#mediaAreaDropUp > div:nth-child(2) > div > div:first-child:has(> button + span) {
+  padding: 16px 20px 12px !important;
+}
+
+#mediaAreaDropUp > div:nth-child(2) > div > div:first-child > button + span {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: var(--theme-text) !important;
+}
+
+/*
+ * Slides is a column that fits the panel: the upload box and the Share button
+ * keep their height and the list of presentations takes what is left, with its
+ * own scroll. So the button never leaves the screen, however short it is.
+ */
+#mediaAreaDropUp > div:nth-child(2) > div:has(#upload-modal),
+#mediaAreaDropUp div:has(> #upload-modal),
+#upload-modal {
+  display: flex !important;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* Upload box: quieter dashes, a light fill, blue on hover. Phones get two of
+   them (photos and documents). */
+#upload-modal > div:has(> input[type="file"]) {
+  flex: 0 0 auto !important;
+  margin: 0 20px !important;
+  padding: 18px 20px !important;
+  border: 1.5px dashed #B9C6D6 !important;
+  border-radius: 12px !important;
+  background: #F7F9FC;
+  transition: border-color .12s ease, background-color .12s ease;
+}
+
+#upload-modal > div:has(> input[type="file"]) + div:has(> input[type="file"]) {
+  margin-top: 8px !important;
+}
+
+#upload-modal > div:has(> input[type="file"]):hover {
+  border-color: var(--theme-primary) !important;
+  background: #EEF5FD;
+}
+
+/* Touch screens: nothing to drag, so the boxes are compact */
+@media (pointer: coarse) {
+  #upload-modal > div:has(> input[type="file"]) {
+    padding: 6px 16px !important;
+  }
+
+  #upload-modal > div:has(> input[type="file"]) p {
+    margin: 0 !important;
+  }
+}
+
+/*
+ * Presentations: a grid (three per row on a laptop, two on a phone, more on a
+ * large monitor) that scrolls down, instead of one row that
+ * scrolls sideways after the second file. Every thumbnail gets the same 16:9
+ * frame, so a portrait page (A4) sits inside it instead of stretching the row.
+ */
+#upload-modal > div:has(> [data-test="presentationItem"]) {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 16px 14px !important;
+  flex: 1 1 auto;
+  align-content: start;
+  min-height: 130px;
+  max-height: 640px;
+  padding: 16px 20px 12px !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  scrollbar-width: thin;
+  scrollbar-color: #C5CBD3 transparent;
+}
+
+#upload-modal [data-test="presentationItem"] {
+  width: auto !important;
+  min-width: 0;
+  max-height: none !important;
+}
+
+#upload-modal [data-test="presentationThumbnail"] {
+  aspect-ratio: 16 / 9;
+  height: auto !important;
+  border-radius: 10px !important;
+  background: #EEF1F5 !important;
+  transition: box-shadow .12s ease;
+}
+
+#upload-modal [data-test="presentationThumbnail"]:hover {
+  box-shadow: 0 0 0 3px rgba(15, 112, 215, .18);
+}
+
+#upload-modal [data-test="presentationThumbnail"] img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+}
+
+/* File name and its two buttons: readable name, two matching 28px buttons */
+#upload-modal [data-test="presentationItem"] > div:last-child {
+  gap: 2px;
+  margin-top: 6px !important;
+}
+
+#upload-modal [data-test="presentationName"] {
+  display: block !important;
+  min-width: 0;
+  white-space: nowrap;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  line-height: 1.3;
+  color: var(--theme-text) !important;
+}
+
+#upload-modal [data-test="presentationItem"] .bbb-button--circle > .bbb-button__icon,
+#upload-modal [data-test="removePresentation"] {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 28px !important;
+  height: 28px !important;
+  padding: 0 !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  color: #6B7280 !important;
+  transition: background-color .12s ease, color .12s ease;
+}
+
+#upload-modal [data-test="presentationItem"] :is(.bbb-button__icon, [data-test="removePresentation"]) > i {
+  font-size: 16px !important;
+  color: inherit !important;
+}
+
+#upload-modal [data-test="presentationItem"] .bbb-button--circle:hover > .bbb-button__icon {
+  background: #E9EDF3 !important;
+  color: var(--theme-text) !important;
+}
+
+#upload-modal [data-test="removePresentation"]:hover {
+  background: #FDECEA !important;
+  color: var(--theme-danger) !important;
+}
+
+/* Video link: a real text field in a quiet box, instead of an underline in
+   a dashed frame that looks like the upload box */
+#mediaAreaDropUp div:has(> div > .MuiTextField-root) {
+  padding: 0 20px 16px !important;
+}
+
+#mediaAreaDropUp div:has(> .MuiTextField-root) {
+  align-items: stretch !important;
+  gap: 12px !important;
+  padding: 16px !important;
+  border: 0 !important;
+  border-radius: 12px !important;
+  background: #F7F9FC !important;
+}
+
+#mediaAreaDropUp .MuiInput-root {
+  padding: 5px 12px;
+  border: 1px solid #D5D8DD;
+  border-radius: 8px;
+  background: #fff;
+  transition: border-color .12s ease, box-shadow .12s ease;
+}
+
+#mediaAreaDropUp .MuiInput-root::before,
+#mediaAreaDropUp .MuiInput-root::after {
+  display: none !important;
+}
+
+#mediaAreaDropUp .MuiInput-root:focus-within {
+  border-color: var(--theme-primary);
+  box-shadow: 0 0 0 3px rgba(15, 112, 215, .18);
+}
+
+#mediaAreaDropUp .MuiInput-root input {
+  border-radius: 0 !important;
+  color: var(--theme-text);
+}
+
+#mediaAreaDropUp .MuiInput-root input::placeholder {
+  color: #8A939E;
+  opacity: 1;
+}
+
+/* Share: same height as the other buttons, not a 50px slab */
+#mediaAreaDropUp div:has(> button:only-child:is([data-test="sharePresentationButton"], [data-test="ShareExternalVideo"])) {
+  flex: 0 0 auto;
+  padding: 12px 20px 16px !important;
+  border-top: 1px solid var(--theme-line) !important;
+}
+
+#mediaAreaDropUp :is([data-test="sharePresentationButton"], [data-test="ShareExternalVideo"]) {
+  height: 44px;
+  padding: 0 16px !important;
+  border-radius: 10px !important;
+  font-size: 14px;
+}
+
 /* ---------- Presentation ---------- */
 
-.bbb-presentation__content,
-#whiteboard-element > div:first-child {
+.bbb-presentation__content {
   border-radius: 10px !important;
+}
+
+/*
+ * The slide keeps its proportions, so a short and wide window (or a portrait
+ * page) leaves empty space beside it, and the toolbar under it was as narrow
+ * as the slide, or wider than it. The block that holds the slide and its
+ * toolbar is now a darker "stage", like the bars of a video player, with the
+ * toolbar across its full width: it reads as one presentation area with the
+ * slide centered in it. On a tall window (a phone held upright) that block is
+ * only as tall as the slide plus the toolbar, so nothing changes there.
+ */
+.bbb-presentation__content > div:has(> #presentationInnerWrapper) {
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--theme-stage);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06);
+}
+
+.bbb-presentation-toolbar {
+  width: 100% !important;
+  border-radius: 0 !important;
+  border-top: 0 !important;
+  background-color: #fff !important;
+}
+
+/*
+ * Slide toolbar: darker and larger icons (they were 15px in mid gray), a soft
+ * hover like the action bar, and the slide picker in medium weight so the
+ * current slide reads at a glance. Disabled buttons fade instead of looking
+ * the same as the enabled ones.
+ */
+.bbb-presentation-toolbar .bbb-button__icon {
+  color: var(--theme-text) !important;
+  transition: background-color .12s ease;
+}
+
+/* Some of them came with a gray tile and others without: none at rest. A
+   button that is on (multi-user whiteboard) keeps its blue. */
+.bbb-presentation-toolbar .bbb-button:not(.bbb-button--primary),
+.bbb-presentation-toolbar .bbb-button:not(.bbb-button--primary) > .bbb-button__icon {
+  background: transparent !important;
+}
+
+.bbb-presentation-toolbar .bbb-button--primary > .bbb-button__icon {
+  color: #fff !important;
+}
+
+.bbb-presentation-toolbar .bbb-button__icon > i {
+  font-size: 18px !important;
+  color: inherit !important;
+}
+
+.bbb-presentation-toolbar .bbb-button:hover > .bbb-button__icon {
+  background: #E6EBF2 !important;
+}
+
+.bbb-presentation-toolbar .bbb-button[aria-disabled="true"] > .bbb-button__icon {
+  opacity: .35;
+  background: transparent !important;
+}
+
+.bbb-presentation-toolbar select {
+  font-weight: 600 !important;
+  color: var(--theme-text) !important;
+  background-color: transparent !important;
+  transition: background-color .12s ease;
+}
+
+.bbb-presentation-toolbar select:hover {
+  background-color: #E6EBF2 !important;
+}
+
+/* The stage already rounds the corners */
+#whiteboard-element > div:first-child {
+  border-radius: 0 !important;
 }
 
 /* ---------- Cameras ---------- */
@@ -451,6 +835,28 @@ div:has(> .bbb-webcam__presenter-badge) {
   background: rgba(0, 0, 0, .6) !important;
   font-size: 12px !important;
   line-height: 20px !important;
+}
+
+/*
+ * Camera pages. On desktop the client puts a solid blue bar on each side of
+ * the grid: here they are translucent like the options button on the top bar,
+ * so they stop competing with the videos. On phones the arrows of the page
+ * bar were 7px glyphs: now 16px chevrons.
+ */
+:is([data-test="previousPageVideoPaginationBtn"], [data-test="nextPageVideoPaginationBtn"]) {
+  border-color: transparent !important;
+  border-radius: var(--theme-radius) !important;
+  background: rgba(255, 255, 255, .12) !important;
+  color: #fff !important;
+  transition: background-color .12s ease;
+}
+
+:is([data-test="previousPageVideoPaginationBtn"], [data-test="nextPageVideoPaginationBtn"]):hover {
+  background: rgba(255, 255, 255, .22) !important;
+}
+
+:is([data-test="mobilePrevPageBtn"], [data-test="mobileNextPageBtn"]) i {
+  font-size: 16px !important;
 }
 
 /* ---------- Top bar ---------- */
@@ -496,6 +902,16 @@ input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
 .Toastify__toast {
   border-radius: 8px !important;
   box-shadow: 0 4px 16px rgba(16, 33, 51, .16) !important;
+}
+
+/* The text inside the notifications is set in Arial; use the client's font.
+   Icons are <i> elements and keep their icon font. */
+:root {
+  --toastify-font-family: inherit;
+}
+
+.Toastify__toast :is(div, span, p) {
+  font-family: inherit !important;
 }
 
 /* [polish:toast] Colored accent on the left by type (like Slack and Linear)
@@ -586,6 +1002,15 @@ div:has(> .bbb-webcam__name) {
   border-radius: 12px !important;
 }
 
+/* Your own messages in a light blue, so the two sides of a conversation differ */
+.bbb-chat-message:not(.bbb-chat-message--system) .chat-message-content {
+  background-color: #F1F3F6 !important;
+}
+
+.bbb-chat-message--own:not(.bbb-chat-message--system) .chat-message-content {
+  background-color: #DDEBFB !important;
+}
+
 .bbb-chat-message__name {
   font-weight: 600 !important;
 }
@@ -663,6 +1088,8 @@ div:has(> .bbb-webcam__name) {
    text together, instead of a caption over a big gray box. The real button
    stretches over the whole box (::after), so the whole box is clickable. */
 .bbb-crowd-actions {
+  /* One per row: side by side, both labels were cut ("Mute all users e...") */
+  grid-template-columns: minmax(0, 1fr) !important;
   gap: 8px;
 }
 
@@ -718,11 +1145,19 @@ div:has(> .bbb-webcam__name) {
   border-radius: 10px;
 }
 
-/* [polish:badge] Unread chat dot: ringed in the bar color so it stands off
-   the icon, like the badges on phone apps */
+/* [polish:badge] Unread dot: a round dot on the top right corner of the icon,
+   ringed in the bar color, like the badges on phone apps. The client stretches
+   it into a pill under the icon, over the user count. */
 .bbb-navigation__item--notification::after {
-  width: 10px !important;
-  height: 10px !important;
+  top: 5px !important;
+  right: 5px !important;
+  bottom: auto !important;
+  left: auto !important;
+  width: 8px !important;
+  height: 8px !important;
+  /* the client keeps it at least 14px wide, which made an oval */
+  min-width: 0 !important;
+  border-radius: 50% !important;
   box-sizing: content-box !important;
   border: 2px solid var(--theme-nav) !important;
   background-color: var(--theme-danger) !important;
@@ -752,6 +1187,70 @@ div:has(> .bbb-webcam__name) {
   #message-input {
     font-size: 16px !important;
   }
+}
+
+/* ---------- Menus ---------- */
+
+/* [polish:menu] Dropdown menus (options, leave, user actions, audio devices):
+   rounded card with a soft shadow, and items that light up as rounded rows
+   inside it, instead of a square sheet with edge-to-edge rows */
+.MuiMenu-paper {
+  padding: 6px !important;
+  border-radius: 12px !important;
+  box-shadow: 0 12px 32px rgba(16, 33, 51, .18), 0 0 0 1px rgba(16, 33, 51, .06) !important;
+}
+
+.MuiMenu-paper .MuiMenuItem-root {
+  min-height: 36px;
+  padding: 8px 12px !important;
+  border-radius: 8px !important;
+  transition: background-color .12s ease;
+}
+
+/* The focused row is already filled in blue by the client; the focus ring
+   on top of it made it look like a framed button */
+.MuiMenu-paper .MuiMenuItem-root:focus-visible {
+  outline: none !important;
+}
+
+/* Touch screens: taller rows */
+@media (pointer: coarse) {
+  .MuiMenu-paper .MuiMenuItem-root {
+    min-height: 44px;
+  }
+}
+
+/* Destructive actions in red */
+.MuiMenu-paper .MuiMenuItem-root:is([data-test="endMeetingButton"], [data-test="removeUser"]),
+.MuiMenu-paper .MuiMenuItem-root:is([data-test="endMeetingButton"], [data-test="removeUser"]) * {
+  color: var(--theme-danger) !important;
+}
+
+/* ---------- Modals ---------- */
+
+/* [polish:modal] A lighter, slightly blurred backdrop (--color-overlay above),
+   a soft shadow, and the title in regular case like the panel titles */
+.ReactModal__Overlay {
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+
+.ReactModal__Content {
+  box-shadow: 0 24px 64px rgba(0, 0, 0, .35) !important;
+}
+
+/* Selects with room to read and to tap (they were 28px tall, text on the edge) */
+.ReactModal__Content select {
+  min-height: 40px;
+  padding: 0 32px 0 12px !important;
+}
+
+.ReactModal__Content > :is(div, header):first-child > :is(p, h1, h2, h3):first-child:not(:only-child) {
+  text-transform: none !important;
+  font-size: 1.2rem !important;
+  font-weight: 600 !important;
+  letter-spacing: -.01em;
+  color: var(--theme-text) !important;
 }
 
 /* ---------- Accessibility ---------- */
@@ -788,6 +1287,7 @@ div:has(> .bbb-webcam__name) {
   .icon-bbb-unmute,
   .icon-bbb-listen,
   .icon-bbb-audio_on,
+  .icon-bbb-volume_level_2,
   .icon-bbb-audio_off,
   .icon-bbb-no_audio,
   .icon-bbb-video,
@@ -860,6 +1360,12 @@ div:has(> .bbb-webcam__name) {
 :is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-no_audio::before {
   -webkit-mask-image: url(./icons/headphone-off.svg);
   mask-image: url(./icons/headphone-off.svg);
+}
+
+/* Listening, sound on (phones show it instead of the headphones) */
+:is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-volume_level_2::before {
+  -webkit-mask-image: url(./icons/volume-2.svg);
+  mask-image: url(./icons/volume-2.svg);
 }
 
 :is(.bbb-actions-bar, .bbb-navigation, .bbb-user-list, .bbb-options-button, [role="menu"]) .icon-bbb-video::before {
@@ -1056,4 +1562,42 @@ div:has(> .bbb-webcam__name) {
 .bbb-options-button .icon-bbb-more::before {
   -webkit-mask-image: url(./icons/menu.svg);
   mask-image: url(./icons/menu.svg);
+}
+
+/* Slide toolbar: previous, next, zoom out and zoom in */
+.bbb-presentation-toolbar :is(.icon-bbb-left_arrow, .icon-bbb-right_arrow, .icon-bbb-substract, .icon-bbb-add)::before,
+:is([data-test="previousPageVideoPaginationBtn"], [data-test="nextPageVideoPaginationBtn"], [data-test="mobilePrevPageBtn"], [data-test="mobileNextPageBtn"]) :is(.icon-bbb-left_arrow, .icon-bbb-right_arrow)::before {
+  content: "" !important;
+  display: block;
+  width: 1em;
+  height: 1em;
+  background-color: currentColor;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+.bbb-presentation-toolbar .icon-bbb-left_arrow::before,
+:is([data-test="previousPageVideoPaginationBtn"], [data-test="mobilePrevPageBtn"]) .icon-bbb-left_arrow::before {
+  -webkit-mask-image: url(./icons/chevron-left.svg);
+  mask-image: url(./icons/chevron-left.svg);
+}
+
+.bbb-presentation-toolbar .icon-bbb-right_arrow::before,
+:is([data-test="nextPageVideoPaginationBtn"], [data-test="mobileNextPageBtn"]) .icon-bbb-right_arrow::before {
+  -webkit-mask-image: url(./icons/chevron-right.svg);
+  mask-image: url(./icons/chevron-right.svg);
+}
+
+.bbb-presentation-toolbar .icon-bbb-substract::before {
+  -webkit-mask-image: url(./icons/minus.svg);
+  mask-image: url(./icons/minus.svg);
+}
+
+.bbb-presentation-toolbar .icon-bbb-add::before {
+  -webkit-mask-image: url(./icons/plus.svg);
+  mask-image: url(./icons/plus.svg);
 }
