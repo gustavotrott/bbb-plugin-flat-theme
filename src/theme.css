@@ -526,6 +526,7 @@ body,
 /* Presentation / media area: keep the single capsule, same height as the other buttons */
 .bbb-actions-bar__media-buttons {
   height: 40px !important;
+  flex-shrink: 0; /* or the bar squeezes it on phones and the second button is cut */
   align-items: center;
   overflow: hidden;
   border-radius: 10px !important;
@@ -1495,6 +1496,34 @@ em-emoji-picker {
 
   #message-input {
     font-size: 16px !important;
+  }
+}
+
+/*
+ * [polish:mobile] Phones: a presenter or moderator has up to nine buttons in
+ * the action bar, which do not fit at 44px. Tighter gaps, and the buttons
+ * share the width of the screen.
+ */
+@media (max-width: 480px) {
+  .bbb-actions-bar:has([data-test="mediaAreaButton"]) {
+    --theme-bar-button: min(44px, calc((100vw - 56px) / 9));
+    padding-right: 8px !important;
+    padding-left: 8px !important;
+  }
+
+  .bbb-actions-bar:has([data-test="mediaAreaButton"]) .bbb-actions-bar__center {
+    gap: 4px !important;
+  }
+
+  .bbb-actions-bar:has([data-test="mediaAreaButton"]) .bbb-actions-bar__media-buttons {
+    gap: 0 !important;
+    margin-inline: 4px 0 !important;
+  }
+
+  .bbb-actions-bar:has([data-test="mediaAreaButton"]) .bbb-button--circle > .bbb-button__icon,
+  .bbb-actions-bar:has([data-test="mediaAreaButton"]) .bbb-actions-bar__media-buttons .bbb-button--circle > .bbb-button__icon {
+    width: var(--theme-bar-button) !important;
+    min-width: 0 !important;
   }
 }
 
