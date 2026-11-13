@@ -1336,6 +1336,47 @@ em-emoji-picker {
   border-radius: 10px;
 }
 
+/*
+ * "Clear all reactions": the third action of the footer and the least used.
+ * A quiet text action with a small icon, in the same font as the two buttons
+ * above it, instead of a large underlined link. Not a third bordered button,
+ * so the footer keeps two clear main actions.
+ */
+.bbb-user-list [data-test="clearAllReactions"] {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  color: #6B7280 !important;
+  text-decoration: none !important;
+  transition: background-color .12s ease, color .12s ease;
+}
+
+.bbb-user-list [data-test="clearAllReactions"] span {
+  font-size: .85rem !important;
+  font-weight: 500 !important;
+  color: inherit !important;
+}
+
+.bbb-user-list [data-test="clearAllReactions"]::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  background-color: currentColor;
+  -webkit-mask: url(./icons/x.svg) center / contain no-repeat;
+  mask: url(./icons/x.svg) center / contain no-repeat;
+}
+
+.bbb-user-list [data-test="clearAllReactions"]:hover {
+  background: #F4F6FA !important;
+  color: var(--theme-text) !important;
+}
+
 /* [polish:badge] Unread dot: a round dot on the top right corner of the icon,
    ringed in the bar color, like the badges on phone apps. The client stretches
    it into a pill under the icon, over the user count. */
