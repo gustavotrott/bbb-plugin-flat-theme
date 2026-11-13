@@ -44,6 +44,13 @@ _Camera images in the screenshots are illustrations._
 - Soft hover on the action and icon bar buttons, keeping the icon dark (the client turns it white for its darker hover).
 - The presentation and media area buttons stay together in a single capsule, with the same height and corners.
 
+**Media area panel (screen share, slides, video...)**
+- Wider, and it grows with the window: 540px on a laptop and up to 720px on a large monitor, instead of a fixed 420px. On a phone it takes the screen width and never gets taller than the visible screen. The title is in regular case like the sidebar panels.
+- The options are wide tiles, four per row, instead of 63px squares, so every label fits ("Share camera as content" was cut).
+- Slides: the presentations are a grid (two per row on a phone, three on a laptop, more on a large monitor) that scrolls down, with the upload box and the Share button always in view, instead of one row that scrolls sideways after the second file. Every thumbnail gets the same 16:9 frame, so a portrait page (A4) sits inside it instead of stretching the row. Readable file names, and two matching small buttons under each one.
+- Play video from link: a real text field in a quiet box, instead of an underline in a dashed frame.
+- Whoever is not the presenter only gets a line of text and one button ("Take presenter"), so the panel is a compact 320px card there.
+
 **Cameras**
 - Videos fill their tile (`object-fit: cover`, like Meet) instead of showing black bars above and below, also while the person is speaking. In fullscreen the whole image is shown, without cropping.
 - The name tag over each video gets a darker background and slightly larger text, and the presenter badge gets the same treatment.
@@ -57,7 +64,23 @@ _Camera images in the screenshots are illustrations._
 
 **Presentation and notifications**
 - The presentation area uses 10px corners, like the cameras and the action bar.
-- Notifications use 8px corners and a soft shadow.
+- On a short and wide window (or with a portrait page) the slide leaves empty space beside it, and the slide toolbar was as narrow as the slide, or wider. The block that holds both is now a darker "stage", like the bars of a video player, with the toolbar across its full width, so it reads as one presentation area (`--theme-stage`).
+- The slide toolbar is white, with darker 18px icons (Lucide chevrons, minus and plus), a soft hover, faded disabled buttons and the slide picker in bold.
+- Notifications use 8px corners, a soft shadow and the client's font instead of Arial.
+
+**Menus and modals**
+- Dropdown menus (options, leave, user actions, audio devices) are rounded cards with a soft shadow and rounded rows. "End session for all" and "Remove user" are red.
+- Modals get a lighter, slightly blurred backdrop, the title in regular case, and 40px selects with padding (they were 28px tall, with the text on the edge).
+
+**User list**
+- "Mute all users except presenter" and "Permissions and Policies" sit one per row, so the labels are no longer cut.
+- The unread dot on the icon bar is a round dot on the top right corner of the icon, instead of a pill over the user count. The user count under the users icon is brighter and bolder.
+
+**Chat**
+- Your own messages are light blue and the others gray.
+
+**Camera pages**
+- The page buttons beside the camera grid are translucent instead of solid blue, and the arrows of the page bar on phones are 16px chevrons.
 
 **Other buttons and fields**
 - Every other button uses 8px corners instead of circles and capsules: top bar (start recording, connection status, leave, options), panels (mute all, polls, timer, breakout rooms, profile), slide navigation and zoom, undo/redo, menus and modals.
@@ -182,6 +205,7 @@ Colors and the icon bar width are CSS variables at the top of [`src/theme.css`](
 | `--theme-primary` | `#0F70D7` | Active marker, active buttons, focus ring |
 | `--theme-danger` | `#D93025` | Muted microphone and camera off |
 | `--theme-moderator` | `#F5B700` | Moderator crown badge |
+| `--theme-stage` | `#0A1622` | Empty space around the slide, inside the presentation area |
 | `--theme-nav-width` | `72px` | Icon bar width |
 
 Change them and rebuild.
@@ -197,7 +221,7 @@ Some details worth knowing if you change the CSS:
 - Selectors use the client's static `bbb-*` classes (`block`, `block__element`, `block--state`), because styled-components class names change on every client build. A few elements without one still go by their `data-test` attribute.
 - Icons replace the `::before` glyph of the `icon-bbb-*` classes with an SVG used as a mask, so they still follow the text color.
 
-Tested on BigBlueButton 4.0.2 (`v4.0.x-develop` of 30/10/2026) with plugin SDK `1.0.0-beta`.
+Tested on BigBlueButton 4.0.2 (`v4.0.x-develop` of 11/11/2026), on desktop and on an iPhone, with plugin SDK `1.0.0-beta`.
 
 The theme targets the client's light mode. On the test server, turning on the client's own dark mode (Settings, Application) left the whole screen blank even with this plugin removed, so dark mode was not styled.
 
