@@ -75,6 +75,7 @@ _Camera images in the screenshots are illustrations._
 
 **User list**
 - "Mute all users except presenter" and "Permissions and Policies" sit one per row, so the labels are no longer cut.
+- "Clear all reactions" is a quiet text action with a small icon under them, instead of a large underlined link.
 - The unread dot on the icon bar is a round dot on the top right corner of the icon, instead of a pill over the user count. The user count under the users icon is brighter and bolder.
 
 **Chat**
