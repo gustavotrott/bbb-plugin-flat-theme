@@ -14,9 +14,10 @@ marks = [
     (4, 232, 645, 232, 602),
     (5, 1390, 150, 1356, 150),
     (6, 545, 600, 545, 646),
-    (7, 930, 758, 970, 758),
-    (8, 1205, 72, 1238, 44),
-    (9, 990, 700, 1020, 700),
+    (7, 930, 758, 975, 758),
+    (8, 1272, 758, 1218, 758),
+    (9, 852, 624, 903, 624),
+    (10, 1205, 72, 1238, 44),
 ]
 labels = [
     "Full-height icon bar, names under icons",
@@ -25,9 +26,10 @@ labels = [
     "Chat bubbles, yours in light blue",
     "Cameras fill the tile, ring on speaker",
     "One action per row, nothing cut",
-    "Lucide icons, blue when active",
+    "Red when mic or camera is off",
+    "Clear icons, you can tell what each does",
+    "Media panel: wide tiles, labels fit",
     "Same corner radius on every button",
-    "Slide controls grouped on a light bar",
 ]
 ACC = "#F25C3B"
 s = [f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="{W}" height="{H+LEG}" viewBox="0 0 {W} {H+LEG}">',
