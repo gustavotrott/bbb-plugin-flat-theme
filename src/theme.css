@@ -126,8 +126,8 @@ body,
 /*
  * A short name under each icon, like Slack, so nobody has to hover to learn
  * what an icon opens. The names are short on purpose (the full ones are still
- * in the tooltip): English by default, Portuguese and Spanish by the page
- * language. An item this list does not know (one added by a plugin) shows its
+ * in the tooltip): English by default, Portuguese, Spanish and German by the
+ * page language. An item this list does not know (one added by a plugin) shows its
  * own label, cut with an ellipsis. Only on screens with a mouse: the bar on
  * phones is too narrow for text.
  */
@@ -187,6 +187,17 @@ body,
   .bbb-navigation__item[data-test="learningDashboardSidebarButton"]:lang(es)::before { content: "Informes"; }
   .bbb-navigation__item[data-test="settingsSidebarButton"]:lang(es)::before { content: "Ajustes"; }
   .bbb-navigation__item:has(.icon-bbb-rooms):lang(es)::before { content: "Salas"; }
+
+  .bbb-navigation__item[data-test="profileSidebarButton"]:lang(de)::before { content: "Profil"; }
+  .bbb-navigation__item[data-test="usersListSidebarButton"]:lang(de)::before { content: "Personen"; }
+  .bbb-navigation__item[data-test="messagesSidebarButton"]:lang(de)::before { content: "Chat"; }
+  .bbb-navigation__item[data-test="sharedNotesSidebarButton"]:lang(de)::before { content: "Notizen"; }
+  .bbb-navigation__item[data-test="appsGallerySidebarButton"]:lang(de)::before { content: "Apps"; }
+  .bbb-navigation__item[data-test="pollSidebarButton"]:lang(de)::before { content: "Umfragen"; }
+  .bbb-navigation__item[data-test="timerSidebarButton"]:lang(de)::before { content: "Timer"; }
+  .bbb-navigation__item[data-test="learningDashboardSidebarButton"]:lang(de)::before { content: "Berichte"; }
+  .bbb-navigation__item[data-test="settingsSidebarButton"]:lang(de)::before { content: "Optionen"; }
+  .bbb-navigation__item:has(.icon-bbb-rooms):lang(de)::before { content: "Räume"; }
 }
 
 /* The icon grows a little under the pointer */
@@ -306,6 +317,92 @@ body,
 .bbb-sidebar-content__panel > div {
   border-radius: 0 !important;
   box-shadow: none !important;
+}
+
+/*
+ * Second panel (multiFunctionalMode): the client draws it as a floating card,
+ * with a margin above, below and on the right and rounded corners, beside the
+ * flush main panel. Here it is flush and full height too, with a line between
+ * the two. The bbb-sidebar-content-auxiliary classes come from
+ * bigbluebutton/bigbluebutton#26415; data-test covers earlier versions.
+ */
+:is(.bbb-sidebar-content-auxiliary, div:has(> [data-test="sidebarContentAuxiliary"])) {
+  padding: 0 !important;
+  background: #fff !important;
+  box-sizing: border-box !important;
+  border-left: 1px solid var(--theme-line);
+}
+
+:is(.bbb-sidebar-content-auxiliary__panel, [data-test="sidebarContentAuxiliary"]) {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+}
+
+:is(.bbb-sidebar-content-auxiliary__panel, [data-test="sidebarContentAuxiliary"]),
+:is(.bbb-sidebar-content-auxiliary__panel, [data-test="sidebarContentAuxiliary"]) > div {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Empty second panel: a quiet note instead of a large heading */
+:is(.bbb-empty-panel, [data-test="emptyPanelTitle"] + div) {
+  justify-content: flex-start;
+  gap: 16px !important;
+  padding: 48px 32px !important;
+}
+
+:is(.bbb-empty-panel__icon, [data-test="emptyPanelTitle"] + div > i) {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: #E8F1FC;
+  color: var(--theme-primary) !important;
+  font-size: 0 !important;
+}
+
+:is(.bbb-empty-panel__icon, [data-test="emptyPanelTitle"] + div > i)::before {
+  content: "" !important;
+  width: 28px;
+  height: 28px;
+  background-color: currentColor;
+  -webkit-mask: url(./icons/columns-2.svg) center / contain no-repeat;
+  mask: url(./icons/columns-2.svg) center / contain no-repeat;
+}
+
+:is(.bbb-empty-panel__title, [data-test="emptyPanelTitle"] + div h2) {
+  font-size: 1.1rem !important;
+  font-weight: 500 !important;
+  color: var(--theme-text) !important;
+}
+
+:is(.bbb-empty-panel__description, [data-test="emptyPanelTitle"] + div p) {
+  max-width: 280px;
+  font-size: .9rem !important;
+  line-height: 1.5;
+  color: #6B7280 !important;
+}
+
+/* The header button that opens the second panel: a split panel icon, on a light blue tile while it is open */
+:is(.bbb-multifunctional-mode-button, [data-test="enableMultiFunctionalMode"]) .icon-bbb-add_column {
+  display: inline-flex !important;
+}
+
+:is(.bbb-multifunctional-mode-button, [data-test="enableMultiFunctionalMode"]) .icon-bbb-add_column::before {
+  content: "" !important;
+  display: block;
+  width: 1em !important;
+  height: 1em !important;
+  background-color: currentColor;
+  -webkit-mask: url(./icons/columns-2.svg) center / contain no-repeat;
+  mask: url(./icons/columns-2.svg) center / contain no-repeat;
+}
+
+.bbb-multifunctional-mode-button--active > .bbb-button__icon {
+  background: #E8F1FC !important;
+  color: var(--theme-primary) !important;
 }
 
 .bbb-panel-header {
@@ -431,8 +528,8 @@ body,
 }
 
 /* Thin, quiet scrollbars in the panels */
-.bbb-sidebar-content__panel,
-.bbb-sidebar-content__panel * {
+:is(.bbb-sidebar-content__panel, .bbb-sidebar-content-auxiliary__panel, [data-test="sidebarContentAuxiliary"]),
+:is(.bbb-sidebar-content__panel, .bbb-sidebar-content-auxiliary__panel, [data-test="sidebarContentAuxiliary"]) * {
   scrollbar-width: thin;
   scrollbar-color: #C5CBD3 transparent;
 }

@@ -31,7 +31,7 @@ _Camera images in the screenshots are illustrations._
 - Narrower: 72px instead of the client's `60px + 2% of the window`.
 - 44px buttons with white 24px icons in a thin stroke (1.25 instead of the 2 used everywhere else). The active item gets a lighter background and a marker on the right edge.
 - On desktop the groups of icons sit together at the top instead of being spread over the whole height. Only the last group (dashboard, settings) stays at the bottom.
-- On desktop each icon has a short name under it (Profile, People, Chat, Notes, Apps, Polls, Timer, Reports, Settings, Rooms), like Slack, in English, Portuguese or Spanish by the page language. The full names stay in the tooltips. The icon grows a little under the pointer.
+- On desktop each icon has a short name under it (Profile, People, Chat, Notes, Apps, Polls, Timer, Reports, Settings, Rooms), like Slack, in English, Portuguese, Spanish or German by the page language. The full names stay in the tooltips. The icon grows a little under the pointer.
 - The logo (when there is one) sits on a white tile, so any logo reads well on the dark bar.
 - On phones, where the client overlays a 48px bar, buttons shrink to 40px and the list scrolls only vertically, with the scroll shadow drawn in the bar color.
 
@@ -39,6 +39,7 @@ _Camera images in the screenshots are illustrations._
 - Flush with the icon bar and full height: no padding, no rounded corners, no shadow.
 - 64px header with a bottom line, title in regular case and regular weight.
 - Chat input pinned to the bottom: a one-line field that grows as you type, with an outline paper plane beside it.
+- The second panel of the multi-functional mode (`multiFunctionalMode`), which opens beside the first one, is flush and full height too, with a thin line between the two, instead of a floating card with rounded corners. Its empty state is a quiet note, and the button that opens it shows a split panel icon on a light blue tile while the second panel is open.
 
 **Action bar**
 - 40px buttons (the size Meet uses) with 10px corners and 20px icons, the same shape as the icon bar buttons. Active buttons (microphone on, hand raised...) are blue with a white icon.
