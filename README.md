@@ -39,6 +39,7 @@ _Camera images in the screenshots are illustrations._
 - Flush with the icon bar and full height: no padding, no rounded corners, no shadow.
 - 64px header with a bottom line, title in regular case and regular weight.
 - Chat input pinned to the bottom: a one-line field that grows as you type, with an outline paper plane beside it.
+- The second panel of the multi-functional mode (`multiFunctionalMode`), which opens beside the first one, is flush and full height too, with a thin line between the two, instead of a floating card with rounded corners. Its empty state is a quiet note, and the button that opens it shows a split panel icon on a light blue tile while the second panel is open.
 
 **Action bar**
 - 40px buttons (the size Meet uses) with 10px corners and 20px icons, the same shape as the icon bar buttons. Active buttons (microphone on, hand raised...) are blue with a white icon.
