@@ -4,26 +4,30 @@
 import base64, sys
 src, out = sys.argv[1], sys.argv[2]
 W, H = 1512, 790
-LEG = 132
+LEG = 182
 img = base64.b64encode(open(src, 'rb').read()).decode()
 # (number, badge x, badge y, target x or None, target y)
 marks = [
-    (1, 36, 590, None, None),
-    (2, 214, 260, 121, 269),
-    (3, 170, 470, 74, 470),
-    (4, 1242, 140, 1201, 140),
-    (5, 790, 758, 822, 758),
-    (6, 1112, 758, 1068, 758),
-    (7, 1205, 64, 1238, 40),
+    (1, 36, 610, None, None),
+    (2, 560, 246, 452, 272),
+    (3, 394, 560, None, None),
+    (4, 232, 645, 232, 602),
+    (5, 1390, 150, 1356, 150),
+    (6, 545, 600, 545, 646),
+    (7, 930, 758, 970, 758),
+    (8, 1205, 72, 1238, 44),
+    (9, 990, 700, 1020, 700),
 ]
 labels = [
-    "Full-height, narrower icon bar",
-    "Moderators: round avatar, gold crown",
-    "Panel flush with the bar, less padding",
-    "Cameras fill the tile, clear name tags",
-    "Red when mic or camera is off",
-    "Larger, clearer icons, easy to read",
+    "Full-height icon bar, names under icons",
+    "Round avatars, crown, presenter badge",
+    "Both side panels flush and full height",
+    "Chat bubbles, yours in light blue",
+    "Cameras fill the tile, ring on speaker",
+    "One action per row, nothing cut",
+    "Lucide icons, blue when active",
     "Same corner radius on every button",
+    "Slide controls grouped on a light bar",
 ]
 ACC = "#F25C3B"
 s = [f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="{W}" height="{H+LEG}" viewBox="0 0 {W} {H+LEG}">',
