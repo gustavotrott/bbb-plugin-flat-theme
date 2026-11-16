@@ -124,8 +124,8 @@ body,
 /*
  * A short name under each icon, like Slack, so nobody has to hover to learn
  * what an icon opens. The names are short on purpose (the full ones are still
- * in the tooltip): English by default, Portuguese and Spanish by the page
- * language. An item this list does not know (one added by a plugin) shows its
+ * in the tooltip): English by default, Portuguese, Spanish and German by the
+ * page language. An item this list does not know (one added by a plugin) shows its
  * own label, cut with an ellipsis. Only on screens with a mouse: the bar on
  * phones is too narrow for text.
  */
@@ -186,6 +186,16 @@ body,
   .bbb-navigation__item[data-test="settingsSidebarButton"]:lang(es)::before { content: "Ajustes"; }
   .bbb-navigation__item:has(.icon-bbb-rooms):lang(es)::before { content: "Salas"; }
 
+  .bbb-navigation__item[data-test="profileSidebarButton"]:lang(de)::before { content: "Profil"; }
+  .bbb-navigation__item[data-test="usersListSidebarButton"]:lang(de)::before { content: "Personen"; }
+  .bbb-navigation__item[data-test="messagesSidebarButton"]:lang(de)::before { content: "Chat"; }
+  .bbb-navigation__item[data-test="sharedNotesSidebarButton"]:lang(de)::before { content: "Notizen"; }
+  .bbb-navigation__item[data-test="appsGallerySidebarButton"]:lang(de)::before { content: "Apps"; }
+  .bbb-navigation__item[data-test="pollSidebarButton"]:lang(de)::before { content: "Umfragen"; }
+  .bbb-navigation__item[data-test="timerSidebarButton"]:lang(de)::before { content: "Timer"; }
+  .bbb-navigation__item[data-test="learningDashboardSidebarButton"]:lang(de)::before { content: "Berichte"; }
+  .bbb-navigation__item[data-test="settingsSidebarButton"]:lang(de)::before { content: "Optionen"; }
+  .bbb-navigation__item:has(.icon-bbb-rooms):lang(de)::before { content: "Räume"; }
 }
 
 /* The icon grows a little under the pointer */
