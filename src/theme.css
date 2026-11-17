@@ -1314,8 +1314,11 @@ div:has(> .bbb-webcam__name) {
 /*
  * Pinned message: a card with room around it and a soft shadow, instead of a
  * full-width block glued to the header, and text the size of the messages.
+ * Needs the bbb-pinned-message classes (bigbluebutton/bigbluebutton#26415).
+ * The structural selector it replaces (a div:has() followed by "*") made the
+ * browser restyle large subtrees on every DOM change, freezing the whiteboard.
  */
-.bbb-chat div:has(> div:first-child > div > .icon-bbb-pin_filled) {
+.bbb-chat .bbb-pinned-message {
   width: calc(100% - 32px) !important;
   box-sizing: border-box !important;
   margin: 12px 16px 4px !important;
@@ -1325,8 +1328,8 @@ div:has(> .bbb-webcam__name) {
   box-shadow: 0 2px 10px rgba(16, 33, 51, .08) !important;
 }
 
-.bbb-chat div:has(> div:first-child > div > .icon-bbb-pin_filled) > div:nth-child(2),
-.bbb-chat div:has(> div:first-child > div > .icon-bbb-pin_filled) > div:nth-child(2) * {
+.bbb-chat .bbb-pinned-message__content,
+.bbb-chat .bbb-pinned-message__content * {
   font-size: 15px !important;
   line-height: 1.45 !important;
   color: #4E5A66 !important;
