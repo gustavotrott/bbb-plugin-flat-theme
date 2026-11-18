@@ -437,10 +437,30 @@ body,
 }
 
 .bbb-chat-form {
+  position: relative;
   margin: 0 !important;
-  padding: 12px 16px 16px;
+  padding: 12px 16px 18px;
   border-top: 1px solid var(--theme-line);
   background: #fff;
+}
+
+/*
+ * The client reserves a 1.5rem row under the field for "X is typing", empty
+ * most of the time, which left a blank strip below the input. The indicator
+ * now sits in the form's bottom padding instead, so it takes no room of its
+ * own and the field does not jump when someone starts typing.
+ */
+.bbb-chat-form > div:has(> [data-test="typingIndicator"]) {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 2px;
+  height: 14px !important;
+  max-height: 14px !important;
+  padding: 0 2px !important;
+  font-size: .7rem !important;
+  line-height: 14px !important;
+  pointer-events: none;
 }
 
 /*
